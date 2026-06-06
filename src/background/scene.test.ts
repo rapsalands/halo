@@ -6,7 +6,7 @@ function weather(over: Partial<Weather>): Weather {
   return {
     code: 0, isDay: true, temp: 20, feelsLike: 20, humidity: 30, windSpeed: 5,
     sunriseToday: '2026-06-06T05:30', sunsetToday: '2026-06-06T19:30',
-    daily: [], stale: false, ...over,
+    daily: [], hourly: [], stale: false, ...over,
   }
 }
 

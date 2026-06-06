@@ -12,6 +12,12 @@ export interface DailyForecast {
   uvMax: number
 }
 
+export interface HourlyForecast {
+  time: string
+  temp: number
+  code: number
+}
+
 export interface Weather {
   code: number
   isDay: boolean
@@ -22,6 +28,7 @@ export interface Weather {
   sunriseToday: string
   sunsetToday: string
   daily: DailyForecast[]
+  hourly: HourlyForecast[]
   stale: boolean
 }
 

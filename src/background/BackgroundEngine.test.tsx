@@ -6,7 +6,7 @@ import { useSettings } from '../store/settings'
 
 const clearDay: Weather = {
   code: 0, isDay: true, temp: 22, feelsLike: 22, humidity: 30, windSpeed: 5,
-  sunriseToday: '2026-06-06T05:30', sunsetToday: '2026-06-06T19:30', daily: [], stale: false,
+  sunriseToday: '2026-06-06T05:30', sunsetToday: '2026-06-06T19:30', daily: [], hourly: [], stale: false,
 }
 
 describe('BackgroundEngine', () => {

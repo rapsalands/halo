@@ -1,7 +1,9 @@
 import { TileFrame } from './TileFrame'
+import { WeatherIcon } from './WeatherIcon'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { describeCode } from '../lib/weatherCodes'
+import { formatClock } from '../lib/time'
 
 const toF = (c: number) => Math.round((c * 9) / 5 + 32)
 
@@ -13,30 +15,54 @@ function weekday(dateStr: string): string {
 export function WeatherTile() {
   const weather = useAppState((s) => s.weather)
   const units = useSettings((s) => s.settings.units)
+  const hour12 = useSettings((s) => s.settings.hour12)
   if (!weather) {
     return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Weather unavailable</div></TileFrame>
   }
-  const temp = units === 'imperial' ? toF(weather.temp) : weather.temp
+  const conv = (c: number) => (units === 'imperial' ? toF(c) : c)
   const { label } = describeCode(weather.code)
+  const today = weather.daily[0]
+  const hours = weather.hourly.slice(0, 8)
+
   return (
-    <TileFrame>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ fontSize: '3.6rem', fontWeight: 800 }}>{temp}°</span>
-        <span style={{ fontSize: '1.1rem', color: 'var(--text-dim)' }}>{label}</span>
+    <TileFrame style={{ minWidth: 320 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <WeatherIcon code={weather.code} isDay={weather.isDay} size={68} />
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+            <span style={{ fontSize: '3.6rem', fontWeight: 800, lineHeight: 1 }}>{conv(weather.temp)}°</span>
+            <span style={{ fontSize: '1.05rem', color: 'var(--text-dim)' }}>{label}</span>
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginTop: 4 }}>
+            Feels {conv(weather.feelsLike)}°
+            {today && <> · H {conv(today.tempMax)}° L {conv(today.tempMin)}°</>}
+          </div>
+        </div>
       </div>
+
       {weather.stale && (
-        <div style={{ fontSize: '0.7rem', color: '#ffd27e', marginTop: 2 }}>· stale</div>
+        <div style={{ fontSize: '0.7rem', color: '#ffd27e', marginTop: 4 }}>· offline, last update</div>
       )}
-      <div style={{ display: 'flex', gap: 18, marginTop: 16 }}>
+
+      {hours.length > 0 && (
+        <div style={{ display: 'flex', gap: 14, marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 12 }}>
+          {hours.map((h) => (
+            <div key={h.time} style={{ textAlign: 'center', fontSize: '0.72rem' }}>
+              <div style={{ color: 'var(--text-dim)' }}>{formatClock(new Date(h.time), hour12)}</div>
+              <WeatherIcon code={h.code} isDay={weather.isDay} size={26} />
+              <div style={{ fontWeight: 600 }}>{conv(h.temp)}°</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 16, marginTop: 14, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 12 }}>
         {weather.daily.map((d) => (
-          <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.85rem' }}>
+          <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.8rem' }}>
             <div style={{ color: 'var(--text-dim)' }}>{weekday(d.date)}</div>
-            <div style={{ fontWeight: 600 }}>
-              {units === 'imperial' ? toF(d.tempMax) : d.tempMax}°
-            </div>
-            <div style={{ color: 'var(--text-dim)' }}>
-              {units === 'imperial' ? toF(d.tempMin) : d.tempMin}°
-            </div>
+            <WeatherIcon code={d.code} isDay={true} size={28} />
+            <div style={{ fontWeight: 600 }}>{conv(d.tempMax)}°</div>
+            <div style={{ color: 'var(--text-dim)' }}>{conv(d.tempMin)}°</div>
           </div>
         ))}
       </div>

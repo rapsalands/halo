@@ -11,6 +11,7 @@ const W: Weather = {
     { date: '2026-06-06', code: 3, tempMax: 27, tempMin: 18, sunrise: '', sunset: '', uvMax: 6 },
     { date: '2026-06-07', code: 0, tempMax: 29, tempMin: 19, sunrise: '', sunset: '', uvMax: 7 },
   ],
+  hourly: [],
   stale: false,
 }
 

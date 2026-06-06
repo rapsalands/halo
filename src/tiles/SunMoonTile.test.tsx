@@ -7,6 +7,7 @@ const W: Weather = {
   code: 0, isDay: true, temp: 22, feelsLike: 22, humidity: 30, windSpeed: 5,
   sunriseToday: '2026-06-06T05:30', sunsetToday: '2026-06-06T19:30',
   daily: [{ date: '2026-06-06', code: 0, tempMax: 27, tempMin: 18, sunrise: '2026-06-06T05:30', sunset: '2026-06-06T19:30', uvMax: 6 }],
+  hourly: [],
   stale: false,
 }
 

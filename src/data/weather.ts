@@ -1,10 +1,11 @@
-import type { GeoLocation, Weather, DailyForecast } from '../store/appState'
+import type { GeoLocation, Weather, DailyForecast, HourlyForecast } from '../store/appState'
 
 export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
   const params = new URLSearchParams({
     latitude: String(loc.lat),
     longitude: String(loc.lon),
     current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m',
+    hourly: 'temperature_2m,weather_code',
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max',
     timezone: 'auto',
     forecast_days: '7',
@@ -23,6 +24,7 @@ export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
     sunset: d.sunset[i],
     uvMax: d.uv_index_max[i],
   }))
+  const hourly: HourlyForecast[] = buildHourly(j.hourly)
   return {
     code: c.weather_code,
     isDay: c.is_day === 1,
@@ -33,6 +35,21 @@ export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
     sunriseToday: daily[0].sunrise,
     sunsetToday: daily[0].sunset,
     daily,
+    hourly,
     stale: false,
   }
+}
+
+/** Map Open-Meteo hourly arrays into the next 12 hours from now. */
+function buildHourly(h: { time: string[]; temperature_2m: number[]; weather_code: number[] } | undefined): HourlyForecast[] {
+  if (!h?.time) return []
+  const nowMs = Date.now()
+  const all: HourlyForecast[] = h.time.map((time, i) => ({
+    time,
+    temp: Math.round(h.temperature_2m[i]),
+    code: h.weather_code[i],
+  }))
+  const startIdx = all.findIndex((e) => new Date(e.time).getTime() >= nowMs)
+  const from = startIdx === -1 ? 0 : startIdx
+  return all.slice(from, from + 12)
 }
