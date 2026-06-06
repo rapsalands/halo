@@ -2,12 +2,13 @@
 
 **Date:** 2026-06-05
 **Status:** Approved (design), pending implementation plan
-**Working name:** TBD (referred to here as "the dashboard")
+**Name:** Halo
 
 ## Summary
 
 A login-free, database-free **static React app** that runs full-screen in a kiosk
-browser on a Raspberry-Pi-class wall panel (RPi / KickPi), always on. Its signature
+browser on a Raspberry-Pi-class wall panel (RPi / KickPi), always on. Product name:
+**Halo**. Its signature
 feature is a **living, weather-reactive background**: the entire scene continuously
 adapts to live weather and time of day — rain streaks when it rains, lightning during
 storms, drifting clouds when overcast, sun rays when clear, stars and the real moon
@@ -32,6 +33,7 @@ screens; every screen configures itself.
 - No cross-device sync (config is per-device; manual export/import only).
 - No 3D/WebGL skies in v1 (canvas + CSS only; revisit later).
 - No "Bento" layout build-out in v1 beyond making it a future drop-in preset.
+- **No News tile in v1** — deferred until a reliable backend-free feed path is chosen.
 
 ## Architecture
 
@@ -45,8 +47,8 @@ location, settings). Tiles never communicate with each other.
 │   │ Clock/Date│        │   Weather + fc   │  │  ← Aurora Glass tiles
 │   └───────────┘        └──────────────────┘  │     (modular widgets)
 │   ┌──────────────┐  ┌──────────┐ ┌────────┐  │
-│   │  Calendar    │  │ News     │ │ Sun/   │  │
-│   │  + holidays  │  │          │ │ Moon   │  │
+│   │  Calendar    │  │ Quote /  │ │ Sun/   │  │
+│   │  + holidays  │  │ On-day   │ │ Moon   │  │
 │   └──────────────┘  └──────────┘ └────────┘  │
 │   ────────── ticker · quote · AQI ─────────  │
 └─────────────────────────────────────────────┘
@@ -106,14 +108,13 @@ and **last-known-good fallback** so a failed request never blanks the wall.
 | Photo gallery | **Picsum** (+ optional curated Unsplash URL list) | rotate every few min | keyless by default |
 | Quote / On this day | free no-key APIs | daily | |
 | Markets ticker | **CoinGecko** (crypto) | ~5–10 min | CORS-friendly; keyless stocks are limited |
-| News headlines | RSS via free RSS-to-JSON service | ~30 min | see caveat |
+
+**News is deferred** — dropped from v1 (see Non-Goals). It needs a CORS workaround
+(RSS-to-JSON service or a Pi-side fetcher) that isn't worth the fragility for the first
+version.
 
 ### Known constraints / honesty flags
 
-- **News (CORS):** Raw RSS feeds typically block browser fetches. To stay backend-free,
-  v1 uses a free, no-login RSS-to-JSON service and accepts its rate limits. If that
-  proves too flaky, News is the single tile that may later warrant a tiny fetch helper
-  running on the Pi. Acceptable trade-off for v1.
 - **Location:** First run auto-detects via free IP geolocation; the user can then search
   any city (Open-Meteo geocoding, no key) and the choice is saved to `localStorage`.
 - **Stocks:** Reliable keyless stock data is scarce; v1 ticker is crypto-first, with
@@ -150,7 +151,7 @@ and **last-known-good fallback** so a failed request never blanks the wall.
 
 ## Open Questions / Future
 
-- Working name for the product.
 - Bento layout preset build-out.
 - Optional WebGL "ultra" background mode for capable devices.
-- Optional Pi-side micro-helper for News if the RSS-to-JSON route is too limited.
+- **News tile** — revisit once a reliable backend-free path is chosen (free RSS-to-JSON
+  service vs. a tiny Pi-side fetcher).
