@@ -1,73 +1,32 @@
-# React + TypeScript + Vite
+# Halo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beautiful, login-free, database-free **weather-reactive wall dashboard** for an always-on kiosk panel (Raspberry Pi / KickPi). The entire background adapts to live weather and time of day — rain streaks when it rains, lightning in storms, drifting clouds, sun rays, twinkling stars and the real moon phase at night, snow in winter — with frosted **Aurora Glass** tiles floating on top.
 
-Currently, two official plugins are available:
+All data comes from free, no-key, public APIs. All configuration lives in each device's `localStorage` — no accounts, no server.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Weather-reactive animated background** (canvas + CSS particles, performance Low/High)
+- **Tiles:** clock + date, weather + 7-day forecast, calendar + public holidays, sun/moon + UV + air quality, daily quote + on-this-day, crypto ticker
+- **Photo background mode** (rotating Picsum photos with weather particles on top)
+- **Per-screen settings panel** — tiles, layout, location, units, holiday country, performance
+- **Config portability** — export/import or `?config=` URL between screens
+- **24/7 resilience** — last-known-good caching, offline indicator, nightly auto-reload
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Data sources (all free, no key)
 
-## Expanding the ESLint configuration
+Open-Meteo (weather + air quality), Nager.Date (holidays), Wikipedia REST (on this day), CoinGecko (crypto), Picsum (photos), ipapi.co (first-run geolocation).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Develop
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+npm install
+npm run dev        # http://localhost:5173
+npm test           # vitest
+npm run build      # static dist/
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Deploy
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+See [DEPLOY.md](./DEPLOY.md). The design and implementation plans live in `docs/superpowers/`.
