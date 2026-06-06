@@ -15,7 +15,8 @@ export function usePolledData<T>(
 ): PolledState<T> {
   const [state, setState] = useState<PolledState<T>>({ data: null, stale: false, error: false })
   const fetcherRef = useRef(fetcher)
-  fetcherRef.current = fetcher
+  // Keep the ref current without writing during render (react-hooks/refs).
+  useEffect(() => { fetcherRef.current = fetcher })
 
   useEffect(() => {
     let cancelled = false
