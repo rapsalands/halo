@@ -7,16 +7,25 @@ import { LayoutRenderer } from './layout/LayoutRenderer'
 import { fetchWithFallback } from './lib/fetchWithFallback'
 import { ipLocate } from './data/geo'
 import { fetchWeather } from './data/weather'
+import { SettingsPanel } from './settings/SettingsPanel'
+import { StaleBadge } from './tiles/StaleBadge'
+import { useNightlyReload } from './hooks/useNightlyReload'
+import { readConfigFromSearch } from './settings/configIO'
 
 const WEATHER_INTERVAL = 12 * 60_000 // 12 minutes
 
 export default function App() {
   useClock()
+  useNightlyReload(3)
   const performance = useSettings((s) => s.settings.performance)
   const configuredLocation = useSettings((s) => s.settings.location)
 
-  // Load persisted settings once.
-  useEffect(() => { useSettings.getState().load() }, [])
+  // Load persisted settings once; a ?config= param overrides for this screen.
+  useEffect(() => {
+    useSettings.getState().load()
+    const fromUrl = readConfigFromSearch(window.location.search)
+    if (fromUrl) useSettings.getState().update(fromUrl)
+  }, [])
 
   // Resolve location: use configured, else IP-detect (cached).
   useEffect(() => {
@@ -60,6 +69,8 @@ export default function App() {
     <div className={performance === 'low' ? 'perf-low' : undefined} style={{ position: 'absolute', inset: 0 }}>
       <BackgroundEngine />
       <LayoutRenderer />
+      <StaleBadge />
+      <SettingsPanel />
     </div>
   )
 }
