@@ -11,8 +11,10 @@ import { SettingsPanel } from './settings/SettingsPanel'
 import { StaleBadge } from './tiles/StaleBadge'
 import { useNightlyReload } from './hooks/useNightlyReload'
 import { readConfigFromSearch } from './settings/configIO'
+import { parseDemo, applyDemo, synthDemoWeather } from './lib/demo'
 
 const WEATHER_INTERVAL = 12 * 60_000 // 12 minutes
+const DEMO = parseDemo(window.location.search) // ?demo=rain|thunder|snow|clear|night|cloudy|fog
 
 export default function App() {
   useClock()
@@ -25,6 +27,8 @@ export default function App() {
     useSettings.getState().load()
     const fromUrl = readConfigFromSearch(window.location.search)
     if (fromUrl) useSettings.getState().update(fromUrl)
+    // Preview mode: show the demo scene instantly, even before any fetch.
+    if (DEMO) useAppState.getState().setWeather(synthDemoWeather(DEMO, new Date()))
   }, [])
 
   // Resolve location: use configured, else IP-detect (cached).
@@ -55,7 +59,9 @@ export default function App() {
     async function poll() {
       try {
         const res = await fetchWithFallback('weather', () => fetchWeather(location!))
-        if (!cancelled) useAppState.getState().setWeather({ ...res.data, stale: res.stale })
+        const w = { ...res.data, stale: res.stale }
+        // In preview mode, keep real temps but force the demo condition.
+        if (!cancelled) useAppState.getState().setWeather(DEMO ? applyDemo(w, DEMO) : w)
       } catch {
         /* no cache yet and network failed — background shows its default scene */
       }
