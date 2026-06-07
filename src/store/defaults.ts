@@ -3,6 +3,8 @@ export type BackgroundMode = 'weather' | 'photo'
 export type Performance = 'low' | 'high'
 export type LayoutPreset = 'photo-first' | 'bento'
 export type TileId = 'clock' | 'weather' | 'calendar' | 'sunmoon' | 'quote' | 'ticker'
+/** Preview scene override: 'live' uses real weather; others force a demo scene. */
+export type Preview = 'live' | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
 
 export interface Settings {
   layout: LayoutPreset
@@ -13,6 +15,7 @@ export interface Settings {
   holidayCountry: string // ISO-3166 alpha-2, e.g. 'IN'
   enabledTiles: Record<TileId, boolean>
   location: { lat: number; lon: number; name: string } | null // null = auto-detect
+  preview: Preview
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -27,4 +30,5 @@ export const DEFAULT_SETTINGS: Settings = {
     sunmoon: true, quote: true, ticker: true,
   },
   location: null,
+  preview: 'live',
 }

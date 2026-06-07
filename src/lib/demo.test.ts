@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseDemo, applyDemo, synthDemoWeather } from './demo'
+import { parseDemoName, overrideFor, applyDemo, synthDemoWeather } from './demo'
 import type { Weather } from '../store/appState'
 
 const base: Weather = {
@@ -10,14 +10,21 @@ const base: Weather = {
   stale: false,
 }
 
-describe('parseDemo', () => {
+describe('parseDemoName', () => {
   it('maps a known preset name', () => {
-    expect(parseDemo('?demo=rain')).toEqual({ code: 63, isDay: true })
-    expect(parseDemo('?demo=NIGHT')).toEqual({ code: 0, isDay: false })
+    expect(parseDemoName('?demo=rain')).toBe('rain')
+    expect(parseDemoName('?demo=NIGHT')).toBe('night')
   })
   it('returns null for unknown or missing', () => {
-    expect(parseDemo('?demo=banana')).toBeNull()
-    expect(parseDemo('?x=1')).toBeNull()
+    expect(parseDemoName('?demo=banana')).toBeNull()
+    expect(parseDemoName('?x=1')).toBeNull()
+  })
+})
+
+describe('overrideFor', () => {
+  it('returns null for live and an override for a preset', () => {
+    expect(overrideFor('live')).toBeNull()
+    expect(overrideFor('thunder')).toEqual({ code: 95, isDay: true })
   })
 })
 

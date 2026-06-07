@@ -4,12 +4,13 @@ interface Drop { x: number; y: number; len: number; speed: number }
 
 export function createRain(init: ParticleInit): ParticleSystem {
   const { width, height, performance } = init
-  const count = performance === 'high' ? 320 : 110
+  const intensity = init.intensity ?? 1
+  const count = Math.round((performance === 'high' ? 320 : 110) * intensity)
   const drops: Drop[] = Array.from({ length: count }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
-    len: 12 + Math.random() * 18,
-    speed: 600 + Math.random() * 500, // px per second
+    len: (12 + Math.random() * 18) * intensity,
+    speed: (600 + Math.random() * 500) * intensity, // px per second
   }))
   return {
     count,

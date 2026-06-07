@@ -2,8 +2,10 @@ import type { Weather, DailyForecast, HourlyForecast } from '../store/appState'
 
 export interface DemoOverride { code: number; isDay: boolean }
 
+export type DemoName = 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
+
 /** Named preview presets → a representative WMO code + day/night. */
-export const DEMO_PRESETS: Record<string, DemoOverride> = {
+export const DEMO_PRESETS: Record<DemoName, DemoOverride> = {
   rain: { code: 63, isDay: true },
   thunder: { code: 95, isDay: true },
   snow: { code: 73, isDay: true },
@@ -13,11 +15,19 @@ export const DEMO_PRESETS: Record<string, DemoOverride> = {
   fog: { code: 45, isDay: true },
 }
 
-/** Read `?demo=rain` (etc.) from a query string. */
-export function parseDemo(search: string): DemoOverride | null {
-  const name = new URLSearchParams(search).get('demo')
-  if (!name) return null
-  return DEMO_PRESETS[name.toLowerCase()] ?? null
+export const DEMO_NAMES = Object.keys(DEMO_PRESETS) as DemoName[]
+
+/** Resolve a preview selection ('live' or a preset name) to an override. */
+export function overrideFor(preview: string): DemoOverride | null {
+  if (preview === 'live') return null
+  return DEMO_PRESETS[preview as DemoName] ?? null
+}
+
+/** Read the `?demo=rain` preset name from a query string, if valid. */
+export function parseDemoName(search: string): DemoName | null {
+  const name = new URLSearchParams(search).get('demo')?.toLowerCase()
+  if (name && name in DEMO_PRESETS) return name as DemoName
+  return null
 }
 
 /** Force a weather object's condition (and all its forecasts) to the override. */

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSettings } from '../store/settings'
-import type { TileId, Units, Performance, BackgroundMode, LayoutPreset } from '../store/defaults'
+import type { TileId, Units, Performance, BackgroundMode, LayoutPreset, Preview } from '../store/defaults'
+import { DEMO_NAMES } from '../lib/demo'
 import { geocodeCity } from '../data/geo'
 import { encodeConfig, decodeConfig } from './configIO'
 
@@ -65,6 +66,15 @@ export function SettingsPanel() {
               onChange={(e) => update({ backgroundMode: e.target.value as BackgroundMode })}>
               <option value="weather">Weather sky</option>
               <option value="photo">Photo gallery</option>
+            </select>
+
+            <label htmlFor="preview" style={field}>Preview scene</label>
+            <select id="preview" value={settings.preview}
+              onChange={(e) => update({ preview: e.target.value as Preview })}>
+              <option value="live">Live (real weather)</option>
+              {DEMO_NAMES.map((n) => (
+                <option key={n} value={n}>{n[0].toUpperCase() + n.slice(1)}</option>
+              ))}
             </select>
 
             <label htmlFor="performance" style={field}>Performance</label>

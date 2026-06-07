@@ -6,6 +6,7 @@ import { ParticleCanvas } from './ParticleCanvas'
 import { Celestial } from './Celestial'
 import { Clouds } from './Clouds'
 import { AuroraGlow } from './AuroraGlow'
+import { Lightning } from './Lightning'
 import { PhotoBackdrop } from './PhotoBackdrop'
 
 export function BackgroundEngine() {
@@ -40,6 +41,7 @@ export function BackgroundEngine() {
       )}
       {/* weather particles drift on top in both modes for cohesion */}
       <ParticleCanvas scene={scene} performance={performance} />
+      {scene === 'thunder' && <Lightning />}
     </div>
   )
 }

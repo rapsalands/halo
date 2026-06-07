@@ -11,8 +11,8 @@ interface Props { scene: Scene; performance: Performance }
 function makeSystem(scene: Scene, width: number, height: number, performance: Performance): ParticleSystem | null {
   const init = { width, height, performance }
   switch (scene) {
-    case 'rain':
-    case 'thunder': return createRain(init)
+    case 'rain': return createRain(init)
+    case 'thunder': return createRain({ ...init, intensity: 1.7 }) // heavier downpour
     case 'snow': return createSnow(init)
     case 'clear-night': return createStars(init)
     default: return null // clear-day, cloudy, fog have no canvas particles

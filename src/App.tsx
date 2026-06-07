@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useClock } from './hooks/useClock'
 import { useSettings } from './store/settings'
-import { useAppState } from './store/appState'
+import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
 import { LayoutRenderer } from './layout/LayoutRenderer'
 import { fetchWithFallback } from './lib/fetchWithFallback'
@@ -11,25 +11,39 @@ import { SettingsPanel } from './settings/SettingsPanel'
 import { StaleBadge } from './tiles/StaleBadge'
 import { useNightlyReload } from './hooks/useNightlyReload'
 import { readConfigFromSearch } from './settings/configIO'
-import { parseDemo, applyDemo, synthDemoWeather } from './lib/demo'
+import { parseDemoName, overrideFor, applyDemo, synthDemoWeather } from './lib/demo'
 
 const WEATHER_INTERVAL = 12 * 60_000 // 12 minutes
-const DEMO = parseDemo(window.location.search) // ?demo=rain|thunder|snow|clear|night|cloudy|fog
 
 export default function App() {
   useClock()
   useNightlyReload(3)
   const performance = useSettings((s) => s.settings.performance)
   const configuredLocation = useSettings((s) => s.settings.location)
+  const preview = useSettings((s) => s.settings.preview)
 
-  // Load persisted settings once; a ?config= param overrides for this screen.
+  // Latest real (fetched) weather; the displayed weather may be a preview override.
+  const realWeather = useRef<Weather | null>(null)
+
+  // Push the right weather into the store given the current preview selection.
+  const applyDisplayed = useCallback(() => {
+    const override = overrideFor(useSettings.getState().settings.preview)
+    const real = realWeather.current
+    if (!override) { if (real) useAppState.getState().setWeather(real); return }
+    useAppState.getState().setWeather(real ? applyDemo(real, override) : synthDemoWeather(override, new Date()))
+  }, [])
+
+  // Load persisted settings once; ?config= and ?demo= params override for this screen.
   useEffect(() => {
     useSettings.getState().load()
     const fromUrl = readConfigFromSearch(window.location.search)
     if (fromUrl) useSettings.getState().update(fromUrl)
-    // Preview mode: show the demo scene instantly, even before any fetch.
-    if (DEMO) useAppState.getState().setWeather(synthDemoWeather(DEMO, new Date()))
+    const demoName = parseDemoName(window.location.search)
+    if (demoName) useSettings.getState().update({ preview: demoName })
   }, [])
+
+  // Re-apply whenever the preview selection changes.
+  useEffect(() => { applyDisplayed() }, [preview, applyDisplayed])
 
   // Resolve location: use configured, else IP-detect (cached).
   useEffect(() => {
@@ -59,9 +73,9 @@ export default function App() {
     async function poll() {
       try {
         const res = await fetchWithFallback('weather', () => fetchWeather(location!))
-        const w = { ...res.data, stale: res.stale }
-        // In preview mode, keep real temps but force the demo condition.
-        if (!cancelled) useAppState.getState().setWeather(DEMO ? applyDemo(w, DEMO) : w)
+        if (cancelled) return
+        realWeather.current = { ...res.data, stale: res.stale }
+        applyDisplayed() // honours the current preview selection
       } catch {
         /* no cache yet and network failed — background shows its default scene */
       }
@@ -69,7 +83,7 @@ export default function App() {
     poll()
     const id = setInterval(poll, WEATHER_INTERVAL)
     return () => { cancelled = true; clearInterval(id) }
-  }, [location])
+  }, [location, applyDisplayed])
 
   return (
     <div className={performance === 'low' ? 'perf-low' : undefined} style={{ position: 'absolute', inset: 0 }}>
