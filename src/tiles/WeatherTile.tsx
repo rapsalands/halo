@@ -21,8 +21,10 @@ export function WeatherTile() {
   }
   const conv = (c: number) => (units === 'imperial' ? toF(c) : c)
   const { label } = describeCode(weather.code)
-  const today = weather.daily[0]
-  const hours = weather.hourly.slice(0, 8)
+  // Defensive: cached weather from an older app version may lack these arrays.
+  const daily = weather.daily ?? []
+  const today = daily[0]
+  const hours = (weather.hourly ?? []).slice(0, 8)
 
   return (
     <TileFrame style={{ minWidth: 320 }}>
@@ -57,7 +59,7 @@ export function WeatherTile() {
       )}
 
       <div style={{ display: 'flex', gap: 16, marginTop: 14, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 12 }}>
-        {weather.daily.map((d) => (
+        {daily.map((d) => (
           <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.8rem' }}>
             <div style={{ color: 'var(--text-dim)' }}>{weekday(d.date)}</div>
             <WeatherIcon code={d.code} isDay={true} size={28} />
