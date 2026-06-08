@@ -14,10 +14,28 @@ The Vite `base` is `./` (relative), so `dist/` works from any path or `file://`.
 ### Netlify (drag-and-drop or Git)
 `netlify.toml` is included. Connect the repo or drag `dist/` into Netlify. The SPA redirect keeps `?config=` URLs working.
 
-### GitHub Pages
+### GitHub Pages (free, automatic — recommended)
+A workflow at `.github/workflows/deploy.yml` builds and publishes on every push to `main`.
+
+One-time setup:
+1. Create a repo and push `main`:
+   ```
+   gh repo create halo --public --source=. --remote=origin --push
+   # (or: create the repo on github.com, then)
+   git remote add origin https://github.com/<you>/halo.git
+   git push -u origin main
+   ```
+2. On GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Push to `main` (or run the workflow manually). The site publishes at
+   `https://<you>.github.io/halo/`.
+
+`base: './'` in `vite.config.ts` keeps asset paths relative, so it works under the
+`/halo/` subpath with no extra config. `?config=` and `?demo=` query params work too.
+
+Manual alternative:
 ```
 npm run build
-npx gh-pages -d dist     # or push dist/ to the gh-pages branch
+npx gh-pages -d dist     # pushes dist/ to a gh-pages branch
 ```
 
 ### Serve locally on the Pi
