@@ -12,6 +12,8 @@ export function createRain(init: ParticleInit): ParticleSystem {
     len: (12 + Math.random() * 18) * intensity,
     speed: (600 + Math.random() * 500) * intensity, // px per second
   }))
+  // Wind: drops fall on a slant; storms (higher intensity) blow harder.
+  const slant = 0.18 + 0.22 * intensity // horizontal : vertical ratio
   return {
     count,
     step(ctx, dt) {
@@ -22,10 +24,15 @@ export function createRain(init: ParticleInit): ParticleSystem {
       for (const d of drops) {
         ctx.beginPath()
         ctx.moveTo(d.x, d.y)
-        ctx.lineTo(d.x, d.y + d.len)
+        ctx.lineTo(d.x + d.len * slant, d.y + d.len)
         ctx.stroke()
         d.y += d.speed * sec
-        if (d.y > height) { d.y = -d.len; d.x = Math.random() * width }
+        d.x += d.speed * slant * sec
+        if (d.y > height || d.x > width + 20) {
+          d.y = -d.len
+          // spawn across a wider range so the slant keeps the screen covered
+          d.x = Math.random() * (width * 1.3) - width * 0.3
+        }
       }
     },
   }

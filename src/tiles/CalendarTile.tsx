@@ -23,37 +23,53 @@ export function CalendarTile() {
     () => fetchHolidays(year, country),
     SIX_H,
   )
-  const holidays = new Set((data ?? []).map((h) => h.date))
+  const holidays = new Map((data ?? []).map((h) => [h.date, h.name]))
 
   return (
-    <TileFrame>
-      <div style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: 10 }}>
+    <TileFrame style={{ minWidth: 380 }}>
+      <div style={{ fontWeight: 800, fontSize: '1.5rem', marginBottom: 12 }}>
         {MONTHS[month]} {year}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, textAlign: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center' }}>
         {DOW.map((d, i) => (
-          <div key={i} style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>{d}</div>
+          <div key={i} style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', paddingBottom: 4 }}>{d}</div>
         ))}
         {grid.map((c) => {
           const isToday = c.iso === todayIso
-          const isHoliday = holidays.has(c.iso)
+          const holidayName = holidays.get(c.iso)
+          const isHoliday = holidayName !== undefined
           return (
             <div
               key={c.iso}
               data-testid="cal-cell"
               data-holiday={isHoliday ? 'true' : undefined}
+              title={holidayName}
               style={{
-                fontSize: '0.85rem',
-                opacity: c.inMonth ? 1 : 0.3,
-                width: 30, height: 30, lineHeight: '30px', margin: '0 auto',
-                borderRadius: '50%',
-                background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,120,120,0.35)' : 'transparent',
+                position: 'relative',
+                height: 46,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
+                paddingTop: 4,
+                opacity: c.inMonth ? 1 : 0.28,
+                borderRadius: 10,
+                background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,120,120,0.18)' : 'transparent',
                 color: isToday ? '#0b0f1a' : 'inherit',
-                fontWeight: isToday ? 800 : 400,
               }}
             >
-              {c.day}
-              {isHoliday && <span data-testid="cal-holiday" style={{ display: 'none' }} />}
+              <span style={{ fontSize: '1.05rem', fontWeight: isToday ? 800 : 500 }}>{c.day}</span>
+              {isHoliday && (
+                <>
+                  <span
+                    style={{
+                      marginTop: 2, fontSize: '0.52rem', lineHeight: 1.1, maxWidth: '96%',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      color: isToday ? '#0b0f1a' : '#ffb0b0', fontWeight: 600,
+                    }}
+                  >
+                    {holidayName}
+                  </span>
+                  <span data-testid="cal-holiday" style={{ display: 'none' }} />
+                </>
+              )}
             </div>
           )
         })}
