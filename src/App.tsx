@@ -10,7 +10,7 @@ import { fetchWeather } from './data/weather'
 import { SettingsPanel } from './settings/SettingsPanel'
 import { StaleBadge } from './tiles/StaleBadge'
 import { useNightlyReload } from './hooks/useNightlyReload'
-import { readConfigFromSearch } from './settings/configIO'
+import { readConfigFromSearch, readLocationFromSearch } from './settings/configIO'
 import { parseDemoName, overrideFor, applyDemo, synthDemoWeather } from './lib/demo'
 
 const WEATHER_INTERVAL = 12 * 60_000 // 12 minutes
@@ -33,11 +33,15 @@ export default function App() {
     useAppState.getState().setWeather(real ? applyDemo(real, override) : synthDemoWeather(override, new Date()))
   }, [])
 
-  // Load persisted settings once; ?config= and ?demo= params override for this screen.
+  // Load persisted settings once; ?config=, ?lat/?lon and ?demo= params override
+  // for this screen. ?lat/?lon is the DashMate kiosk's location hand-off (wins
+  // over a persisted/config location since it's applied last).
   useEffect(() => {
     useSettings.getState().load()
     const fromUrl = readConfigFromSearch(window.location.search)
     if (fromUrl) useSettings.getState().update(fromUrl)
+    const fromLoc = readLocationFromSearch(window.location.search)
+    if (fromLoc) useSettings.getState().update(fromLoc)
     const demoName = parseDemoName(window.location.search)
     if (demoName) useSettings.getState().update({ preview: demoName })
   }, [])

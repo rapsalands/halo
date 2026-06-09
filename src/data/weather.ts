@@ -37,6 +37,7 @@ export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
     daily,
     hourly,
     stale: false,
+    timezone: typeof j.timezone === 'string' ? j.timezone : undefined,
   }
 }
 

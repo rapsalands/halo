@@ -1,8 +1,46 @@
 export type DayPart = 'dawn' | 'day' | 'dusk' | 'night'
 
-export function formatClock(date: Date, hour12: boolean): string {
-  let h = date.getHours()
-  const m = date.getMinutes().toString().padStart(2, '0')
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December']
+
+/**
+ * Calendar/clock parts for `date` in the given IANA `timeZone`. With no timeZone
+ * it falls back to the host's local zone (legacy behaviour), so callers without a
+ * configured location are unaffected.
+ */
+function zonedParts(date: Date, timeZone?: string) {
+  if (!timeZone) {
+    return {
+      hour: date.getHours(), minute: date.getMinutes(),
+      weekday: date.getDay(), month: date.getMonth(), day: date.getDate(),
+    }
+  }
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      hour: '2-digit', minute: '2-digit', weekday: 'long', month: 'numeric', day: 'numeric',
+    }).formatToParts(date)
+    const p = Object.fromEntries(parts.map((x) => [x.type, x.value])) as Record<string, string>
+    return {
+      hour: Number(p.hour) % 24,
+      minute: Number(p.minute),
+      weekday: WEEKDAYS.indexOf(p.weekday),
+      month: Number(p.month) - 1,
+      day: Number(p.day),
+    }
+  } catch {
+    return {
+      hour: date.getHours(), minute: date.getMinutes(),
+      weekday: date.getDay(), month: date.getMonth(), day: date.getDate(),
+    }
+  }
+}
+
+export function formatClock(date: Date, hour12: boolean, timeZone?: string): string {
+  const { hour, minute } = zonedParts(date, timeZone)
+  let h = hour
+  const m = minute.toString().padStart(2, '0')
   if (hour12) {
     h = h % 12
     if (h === 0) h = 12
@@ -11,12 +49,9 @@ export function formatClock(date: Date, hour12: boolean): string {
   return `${h.toString().padStart(2, '0')}:${m}`
 }
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December']
-
-export function formatLongDate(date: Date): string {
-  return `${WEEKDAYS[date.getDay()]} · ${MONTHS[date.getMonth()]} ${date.getDate()}`
+export function formatLongDate(date: Date, timeZone?: string): string {
+  const { weekday, month, day } = zonedParts(date, timeZone)
+  return `${WEEKDAYS[weekday]} · ${MONTHS[month]} ${day}`
 }
 
 const WINDOW_MS = 45 * 60_000 // dawn/dusk window around sun events

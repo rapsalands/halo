@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { encodeConfig, decodeConfig, readConfigFromSearch } from './configIO'
+import { encodeConfig, decodeConfig, readConfigFromSearch, readLocationFromSearch } from './configIO'
 import { DEFAULT_SETTINGS } from '../store/defaults'
 
 describe('configIO', () => {
@@ -22,5 +22,20 @@ describe('configIO', () => {
 
   it('returns null when there is no config param', () => {
     expect(readConfigFromSearch('?foo=bar')).toBeNull()
+  })
+
+  it('reads an explicit lat/lon/place location param', () => {
+    const got = readLocationFromSearch('?lat=37.77299&lon=-122.41136&place=San+Francisco%2C+CA')
+    expect(got?.location).toEqual({ lat: 37.77299, lon: -122.41136, name: 'San Francisco, CA' })
+  })
+
+  it('defaults the place label when omitted', () => {
+    expect(readLocationFromSearch('?lat=40.7&lon=-74')?.location?.name).toBe('Configured location')
+  })
+
+  it('returns null without finite lat/lon', () => {
+    expect(readLocationFromSearch('?place=Nowhere')).toBeNull()
+    expect(readLocationFromSearch('?lat=abc&lon=2')).toBeNull()
+    expect(readLocationFromSearch('?foo=bar')).toBeNull()
   })
 })
