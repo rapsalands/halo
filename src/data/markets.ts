@@ -4,10 +4,11 @@ const SYMBOLS: Record<string, string> = {
   bitcoin: 'BTC', ethereum: 'ETH', solana: 'SOL', cardano: 'ADA', dogecoin: 'DOGE',
 }
 
-export async function fetchMarkets(ids: string[]): Promise<Coin[]> {
+export async function fetchMarkets(ids: string[], currency = 'usd'): Promise<Coin[]> {
+  const cur = currency.toLowerCase()
   const params = new URLSearchParams({
     ids: ids.join(','),
-    vs_currencies: 'usd',
+    vs_currencies: cur,
     include_24hr_change: 'true',
   })
   const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?${params}`)
@@ -18,7 +19,7 @@ export async function fetchMarkets(ids: string[]): Promise<Coin[]> {
     .map((id) => ({
       id,
       symbol: SYMBOLS[id] ?? id.slice(0, 4).toUpperCase(),
-      price: j[id].usd,
-      change24h: j[id].usd_24h_change ?? 0,
+      price: j[id][cur],
+      change24h: j[id][`${cur}_24h_change`] ?? 0,
     }))
 }

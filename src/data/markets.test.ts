@@ -19,6 +19,17 @@ describe('fetchMarkets', () => {
     ])
   })
 
+  it('prices in the requested currency', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ bitcoin: { inr: 5400000, inr_24h_change: 0.8 } }),
+    }))
+    vi.stubGlobal('fetch', fetchMock as unknown as typeof fetch)
+    const coins = await fetchMarkets(['bitcoin'], 'inr')
+    expect(coins[0]).toEqual({ id: 'bitcoin', symbol: 'BTC', price: 5400000, change24h: 0.8 })
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('vs_currencies=inr'))
+  })
+
   it('throws on a non-ok response', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 429 })) as unknown as typeof fetch)
     await expect(fetchMarkets(['bitcoin'])).rejects.toThrow()

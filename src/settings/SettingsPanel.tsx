@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useSettings } from '../store/settings'
 import {
-  ACCENT_SWATCHES,
+  ACCENT_SWATCHES, TICKER_CURRENCIES,
   type TileId, type Units, type Performance, type BackgroundMode,
   type LayoutPreset, type Preview,
 } from '../store/defaults'
@@ -12,8 +12,12 @@ import './settings.css'
 
 const TILE_LABELS: Record<TileId, string> = {
   clock: 'Clock', weather: 'Weather', calendar: 'Calendar',
-  sunmoon: 'Sun & Moon', quote: 'Quote', ticker: 'Ticker',
+  sunmoon: 'Sun & Moon', quote: 'Quote', ticker: 'Ticker', air: 'Air quality',
 }
+
+const CURRENCY_OPTS = Object.keys(TICKER_CURRENCIES).map((c) => ({ value: c, label: c.toUpperCase() }))
+const HOURS = Array.from({ length: 24 }, (_, h) => h)
+function hourLabel(h: number): string { return `${h.toString().padStart(2, '0')}:00` }
 
 /** Preview selector chips → friendly label + glyph. */
 const SCENE_META: Record<Preview, { label: string; ico: string }> = {
@@ -76,10 +80,16 @@ export function SettingsPanel() {
   const [importText, setImportText] = useState('')
   const settings = useSettings((s) => s.settings)
   const update = useSettings((s) => s.update)
+  const [coinsText, setCoinsText] = useState(settings.tickerCoins.join(', '))
 
   async function searchCity() {
     const loc = await geocodeCity(city)
     if (loc) { update({ location: loc }); setCity('') }
+  }
+
+  function commitCoins() {
+    const ids = coinsText.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+    if (ids.length) update({ tickerCoins: ids })
   }
 
   return (
@@ -169,6 +179,58 @@ export function SettingsPanel() {
               </div>
               <div className="set-row">
                 <Toggle label="12-hour clock" checked={settings.hour12} onChange={(hour12) => update({ hour12 })} />
+              </div>
+              <div className="set-row">
+                <Toggle label="Show seconds" checked={settings.showSeconds} onChange={(showSeconds) => update({ showSeconds })} />
+              </div>
+              <div className="set-col">
+                <label htmlFor="greet" className="set-label">Greeting name</label>
+                <input
+                  id="greet" className="set-input" placeholder="e.g. Sandeep"
+                  value={settings.greetingName} maxLength={24}
+                  onChange={(e) => update({ greetingName: e.target.value })}
+                />
+              </div>
+            </Section>
+
+            <Section title="Overnight dimming">
+              <div className="set-row">
+                <Toggle label="Auto-dim at night" checked={settings.nightDim} onChange={(nightDim) => update({ nightDim })} />
+              </div>
+              <div className="set-row">
+                <span>From</span>
+                <select className="set-input" style={{ width: 110 }} value={settings.dimStart}
+                  onChange={(e) => update({ dimStart: Number(e.target.value) })}>
+                  {HOURS.map((h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
+                </select>
+              </div>
+              <div className="set-row">
+                <span>To</span>
+                <select className="set-input" style={{ width: 110 }} value={settings.dimEnd}
+                  onChange={(e) => update({ dimEnd: Number(e.target.value) })}>
+                  {HOURS.map((h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
+                </select>
+              </div>
+            </Section>
+
+            <Section title="Markets ticker">
+              <div className="set-col">
+                <label htmlFor="coins" className="set-label">Coins (CoinGecko ids, comma-separated)</label>
+                <input
+                  id="coins" className="set-input" placeholder="bitcoin, ethereum, solana"
+                  value={coinsText}
+                  onChange={(e) => setCoinsText(e.target.value)}
+                  onBlur={commitCoins}
+                  onKeyDown={(e) => { if (e.key === 'Enter') commitCoins() }}
+                />
+              </div>
+              <div className="set-col">
+                <span className="set-label">Currency</span>
+                <Segmented<string>
+                  wide value={settings.tickerCurrency}
+                  options={CURRENCY_OPTS}
+                  onChange={(tickerCurrency) => update({ tickerCurrency })}
+                />
               </div>
             </Section>
 

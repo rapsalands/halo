@@ -8,6 +8,7 @@ import { CalendarTile } from '../tiles/CalendarTile'
 import { SunMoonTile } from '../tiles/SunMoonTile'
 import { QuoteTile } from '../tiles/QuoteTile'
 import { TickerTile } from '../tiles/TickerTile'
+import { AirQualityTile } from '../tiles/AirQualityTile'
 
 const TILES: Partial<Record<TileId, () => ReactNode>> = {
   clock: () => <ClockTile />,
@@ -16,6 +17,7 @@ const TILES: Partial<Record<TileId, () => ReactNode>> = {
   sunmoon: () => <SunMoonTile />,
   quote: () => <QuoteTile />,
   ticker: () => <TickerTile />,
+  air: () => <AirQualityTile />,
 }
 
 export function LayoutRenderer() {

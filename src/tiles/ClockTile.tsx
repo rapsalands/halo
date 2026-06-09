@@ -1,17 +1,23 @@
 import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
-import { formatClock, formatLongDate } from '../lib/time'
+import { formatClock, formatLongDate, greeting } from '../lib/time'
 
 export function ClockTile() {
   const now = useAppState((s) => s.now)
   const tz = useAppState((s) => s.weather?.timezone)
   const place = useAppState((s) => s.location?.name)
   const hour12 = useSettings((s) => s.settings.hour12)
+  const showSeconds = useSettings((s) => s.settings.showSeconds)
+  const name = useSettings((s) => s.settings.greetingName)
+  const greet = name.trim() ? `${greeting(now, tz)}, ${name.trim()}` : greeting(now, tz)
   return (
     <TileFrame>
+      <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--accent)', marginBottom: 6 }}>
+        {greet}
+      </div>
       <div style={{ fontSize: '5.2rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-2px' }}>
-        {formatClock(now, hour12, tz)}
+        {formatClock(now, hour12, tz, showSeconds)}
       </div>
       <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-dim)', marginTop: 8 }}>
         {formatLongDate(now, tz)}

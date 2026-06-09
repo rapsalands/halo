@@ -9,7 +9,7 @@ describe('layout presets', () => {
   })
 
   it('slotsFor returns only enabled tiles that have a slot', () => {
-    const slots = slotsFor('photo-first', { clock: true, weather: false, calendar: true, sunmoon: false, quote: false, ticker: false })
+    const slots = slotsFor('photo-first', { clock: true, weather: false, calendar: true, sunmoon: false, quote: false, ticker: false, air: false })
     const ids = slots.map((s) => s.id)
     expect(ids).toContain('clock')
     expect(ids).toContain('calendar')

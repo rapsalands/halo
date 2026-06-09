@@ -1,15 +1,23 @@
 import { usePolledData } from '../hooks/usePolledData'
+import { useSettings } from '../store/settings'
+import { TICKER_CURRENCIES } from '../store/defaults'
 import { fetchMarkets, type Coin } from '../data/markets'
 
-const COINS = ['bitcoin', 'ethereum', 'solana']
 const INTERVAL = 8 * 60_000
 
-function fmtPrice(n: number): string {
-  return n >= 1000 ? `$${Math.round(n).toLocaleString()}` : `$${n.toFixed(2)}`
+function fmtPrice(n: number, sym: string): string {
+  return n >= 1000 ? `${sym}${Math.round(n).toLocaleString()}` : `${sym}${n.toFixed(2)}`
 }
 
 export function TickerTile() {
-  const { data } = usePolledData<Coin[]>('markets', () => fetchMarkets(COINS), INTERVAL)
+  const coinsCfg = useSettings((s) => s.settings.tickerCoins)
+  const currency = useSettings((s) => s.settings.tickerCurrency)
+  const sym = TICKER_CURRENCIES[currency] ?? ''
+  const { data } = usePolledData<Coin[]>(
+    `markets:${currency}:${coinsCfg.join(',')}`,
+    () => fetchMarkets(coinsCfg, currency),
+    INTERVAL,
+  )
   const coins = data ?? []
   return (
     <div
@@ -21,7 +29,7 @@ export function TickerTile() {
         return (
           <span key={c.id} style={{ display: 'inline-flex', gap: 8, alignItems: 'baseline' }}>
             <strong>{c.symbol}</strong>
-            <span>{fmtPrice(c.price)}</span>
+            <span>{fmtPrice(c.price, sym)}</span>
             <span style={{ color: up ? '#5fd38a' : '#ff7e7e', fontSize: '0.85rem' }}>
               {up ? '▲' : '▼'} {Math.abs(c.change24h).toFixed(1)}%
             </span>

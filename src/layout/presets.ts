@@ -12,6 +12,7 @@ export const PRESETS: Record<LayoutPreset, Preset> = {
     slots: {
       clock: { top: '5%', left: '4%' },
       weather: { top: '6%', right: '4%' },
+      air: { top: '27%', left: '4%', width: '18%' },
       calendar: { bottom: '8%', left: '4%', width: '32%' },
       sunmoon: { bottom: '8%', right: '4%', width: '24%' },
       quote: { bottom: '8%', left: '40%', width: '28%' },
@@ -24,6 +25,7 @@ export const PRESETS: Record<LayoutPreset, Preset> = {
     slots: {
       clock: { top: '4%', left: '3%', width: '40%' },
       weather: { top: '4%', right: '3%', width: '48%' },
+      air: { top: '30%', left: '3%', width: '22%' },
       calendar: { bottom: '6%', left: '3%', width: '30%' },
       sunmoon: { bottom: '6%', right: '3%', width: '28%' },
       quote: { bottom: '6%', left: '35%', width: '28%' },

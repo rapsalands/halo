@@ -2,7 +2,7 @@ export type Units = 'metric' | 'imperial'
 export type BackgroundMode = 'weather' | 'photo'
 export type Performance = 'low' | 'high'
 export type LayoutPreset = 'photo-first' | 'bento'
-export type TileId = 'clock' | 'weather' | 'calendar' | 'sunmoon' | 'quote' | 'ticker'
+export type TileId = 'clock' | 'weather' | 'calendar' | 'sunmoon' | 'quote' | 'ticker' | 'air'
 /** Preview scene override: 'live' uses real weather; others force a demo scene. */
 export type Preview =
   | 'live' | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
@@ -20,6 +20,22 @@ export interface Settings {
   preview: Preview
   /** UI accent (hex) — tints tiles, calendar "today" and settings chrome. */
   accent: string
+  /** Show a time-of-day greeting on the clock; name is appended if set. */
+  greetingName: string
+  /** Show seconds on the big clock. */
+  showSeconds: boolean
+  /** Auto-dim the whole panel overnight (kiosk-friendly). */
+  nightDim: boolean
+  dimStart: number // hour 0–23 the dimming begins
+  dimEnd: number // hour 0–23 the dimming ends
+  /** Markets ticker: which CoinGecko coin ids and the fiat to price them in. */
+  tickerCoins: string[]
+  tickerCurrency: string // 'usd' | 'eur' | 'inr' | 'gbp' | ...
+}
+
+/** Fiat currencies offered for the ticker → display symbol. */
+export const TICKER_CURRENCIES: Record<string, string> = {
+  usd: '$', eur: '€', inr: '₹', gbp: '£',
 }
 
 /** Curated accent swatches shown in settings; first is the default. */
@@ -36,9 +52,16 @@ export const DEFAULT_SETTINGS: Settings = {
   holidayCountry: 'IN',
   enabledTiles: {
     clock: true, weather: true, calendar: true,
-    sunmoon: true, quote: true, ticker: true,
+    sunmoon: true, quote: true, ticker: true, air: true,
   },
   location: null,
   preview: 'live',
   accent: '#7fd0ff',
+  greetingName: '',
+  showSeconds: false,
+  nightDim: false,
+  dimStart: 23,
+  dimEnd: 6,
+  tickerCoins: ['bitcoin', 'ethereum', 'solana'],
+  tickerCurrency: 'usd',
 }

@@ -1,11 +1,7 @@
 import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
-import { usePolledData } from '../hooks/usePolledData'
 import { moonPhase } from '../lib/sun'
 import { formatClock } from '../lib/time'
-import { fetchAirQuality, type AirQuality } from '../data/airQuality'
-
-const AQI_INTERVAL = 30 * 60_000
 
 function hhmm(iso: string): string {
   return formatClock(new Date(iso), false)
@@ -14,13 +10,6 @@ function hhmm(iso: string): string {
 export function SunMoonTile() {
   const weather = useAppState((s) => s.weather)
   const now = useAppState((s) => s.now)
-  const location = useAppState((s) => s.location)
-
-  const { data: aq } = usePolledData<AirQuality>(
-    location ? `aqi:${location.lat},${location.lon}` : 'aqi:none',
-    () => fetchAirQuality(location!),
-    AQI_INTERVAL,
-  )
 
   if (!weather) {
     return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Sun/Moon unavailable</div></TileFrame>
@@ -38,7 +27,6 @@ export function SunMoonTile() {
         <span data-testid="moon-name">{moon.name} · {Math.round(moon.illumination * 100)}%</span>
       </div>
       <div style={row}><span style={{ color: 'var(--text-dim)' }}>UV</span><span>{Math.round(uv)}</span></div>
-      <div style={row}><span style={{ color: 'var(--text-dim)' }}>Air</span><span>{aq ? `AQI ${aq.usAqi}` : '—'}</span></div>
     </TileFrame>
   )
 }

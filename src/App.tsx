@@ -3,6 +3,7 @@ import { useClock } from './hooks/useClock'
 import { useSettings } from './store/settings'
 import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
+import { NightDim } from './background/NightDim'
 import { LayoutRenderer } from './layout/LayoutRenderer'
 import { fetchWithFallback } from './lib/fetchWithFallback'
 import { ipLocate } from './data/geo'
@@ -97,6 +98,7 @@ export default function App() {
     >
       <BackgroundEngine />
       <LayoutRenderer />
+      <NightDim />
       <StaleBadge />
       <SettingsPanel />
     </div>
