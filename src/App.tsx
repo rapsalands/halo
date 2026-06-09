@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useClock } from './hooks/useClock'
 import { useSettings } from './store/settings'
 import { useAppState, type Weather } from './store/appState'
@@ -21,6 +21,7 @@ export default function App() {
   const performance = useSettings((s) => s.settings.performance)
   const configuredLocation = useSettings((s) => s.settings.location)
   const preview = useSettings((s) => s.settings.preview)
+  const accent = useSettings((s) => s.settings.accent)
 
   // Latest real (fetched) weather; the displayed weather may be a preview override.
   const realWeather = useRef<Weather | null>(null)
@@ -90,7 +91,10 @@ export default function App() {
   }, [location, applyDisplayed])
 
   return (
-    <div className={performance === 'low' ? 'perf-low' : undefined} style={{ position: 'absolute', inset: 0 }}>
+    <div
+      className={performance === 'low' ? 'perf-low' : undefined}
+      style={{ position: 'absolute', inset: 0, '--accent': accent } as CSSProperties}
+    >
       <BackgroundEngine />
       <LayoutRenderer />
       <StaleBadge />

@@ -1,13 +1,73 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useSettings } from '../store/settings'
-import type { TileId, Units, Performance, BackgroundMode, LayoutPreset, Preview } from '../store/defaults'
+import {
+  ACCENT_SWATCHES,
+  type TileId, type Units, type Performance, type BackgroundMode,
+  type LayoutPreset, type Preview,
+} from '../store/defaults'
 import { DEMO_NAMES } from '../lib/demo'
 import { geocodeCity } from '../data/geo'
 import { encodeConfig, decodeConfig } from './configIO'
+import './settings.css'
 
 const TILE_LABELS: Record<TileId, string> = {
   clock: 'Clock', weather: 'Weather', calendar: 'Calendar',
   sunmoon: 'Sun & Moon', quote: 'Quote', ticker: 'Ticker',
+}
+
+/** Preview selector chips → friendly label + glyph. */
+const SCENE_META: Record<Preview, { label: string; ico: string }> = {
+  live: { label: 'Live', ico: '📡' },
+  clear: { label: 'Clear', ico: '☀️' },
+  cloudy: { label: 'Cloudy', ico: '☁️' },
+  fog: { label: 'Fog', ico: '🌫️' },
+  rain: { label: 'Rain', ico: '🌧️' },
+  thunder: { label: 'Thunder', ico: '⛈️' },
+  snow: { label: 'Snow', ico: '❄️' },
+  night: { label: 'Clear night', ico: '🌙' },
+  'night-rain': { label: 'Night rain', ico: '🌧️' },
+  'night-thunder': { label: 'Night storm', ico: '⛈️' },
+}
+const SCENE_ORDER: Preview[] = ['live', ...DEMO_NAMES]
+
+interface SegOption<T extends string> { value: T; label: string }
+
+function Segmented<T extends string>(
+  { value, options, onChange, wide }: { value: T; options: SegOption<T>[]; onChange: (v: T) => void; wide?: boolean },
+) {
+  return (
+    <div className={wide ? 'seg seg-wide' : 'seg'}>
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          className={value === o.value ? 'active' : undefined}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="switch">
+      <span>{label}</span>
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <span className="track" />
+    </label>
+  )
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="set-section">
+      <h3>{title}</h3>
+      {children}
+    </section>
+  )
 }
 
 export function SettingsPanel() {
@@ -19,113 +79,156 @@ export function SettingsPanel() {
 
   async function searchCity() {
     const loc = await geocodeCity(city)
-    if (loc) update({ location: loc })
+    if (loc) { update({ location: loc }); setCity('') }
   }
-
-  const field = { display: 'block', margin: '12px 0 4px', fontSize: '0.8rem', color: 'var(--text-dim)' } as const
 
   return (
     <>
-      <button
-        aria-label="Settings"
-        onClick={() => setOpen(true)}
-        style={{
-          position: 'absolute', top: 10, right: 10, zIndex: 20, width: 40, height: 40,
-          borderRadius: '50%', border: '1px solid rgba(255,255,255,0.25)',
-          background: 'rgba(0,0,0,0.3)', color: '#fff', cursor: 'pointer', fontSize: '1.1rem',
-        }}
-      >
-        ⚙
-      </button>
+      <button className="set-gear" aria-label="Settings" onClick={() => setOpen(true)}>⚙</button>
 
       {open && (
         <div
           data-testid="settings-overlay"
-          style={{
-            position: 'absolute', inset: 0, zIndex: 30, display: 'flex',
-            justifyContent: 'flex-end', background: 'rgba(0,0,0,0.5)',
-          }}
+          className="set-scrim"
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
         >
-          <div className="glass" style={{ width: 360, height: '100%', overflowY: 'auto', borderRadius: 0, padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.3rem' }}>Settings</h2>
-              <button aria-label="Close" onClick={() => setOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.4rem', cursor: 'pointer' }}>×</button>
+          <div className="set-panel">
+            <div className="set-head">
+              <h2>Settings</h2>
+              <button className="set-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
             </div>
 
-            <label htmlFor="layout" style={field}>Layout</label>
-            <select id="layout" value={settings.layout}
-              onChange={(e) => update({ layout: e.target.value as LayoutPreset })}>
-              <option value="photo-first">Photo-first</option>
-              <option value="bento">Bento</option>
-            </select>
+            <Section title="Appearance">
+              <div className="set-col">
+                <span className="set-label">Layout</span>
+                <Segmented<LayoutPreset>
+                  wide value={settings.layout}
+                  options={[{ value: 'photo-first', label: 'Photo-first' }, { value: 'bento', label: 'Bento' }]}
+                  onChange={(layout) => update({ layout })}
+                />
+              </div>
+              <div className="set-col">
+                <span className="set-label">Background</span>
+                <Segmented<BackgroundMode>
+                  wide value={settings.backgroundMode}
+                  options={[{ value: 'weather', label: 'Weather sky' }, { value: 'photo', label: 'Photo gallery' }]}
+                  onChange={(backgroundMode) => update({ backgroundMode })}
+                />
+              </div>
+              <div className="set-col">
+                <span className="set-label">Performance</span>
+                <Segmented<Performance>
+                  wide value={settings.performance}
+                  options={[{ value: 'high', label: 'High' }, { value: 'low', label: 'Low' }]}
+                  onChange={(performance) => update({ performance })}
+                />
+              </div>
+              <div className="set-col">
+                <span className="set-label">Accent color</span>
+                <div className="swatches">
+                  {ACCENT_SWATCHES.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-label={`Accent ${c}`}
+                      className={settings.accent === c ? 'swatch active' : 'swatch'}
+                      style={{ background: c, color: c }}
+                      onClick={() => update({ accent: c })}
+                    />
+                  ))}
+                </div>
+              </div>
+            </Section>
 
-            <label htmlFor="background" style={field}>Background</label>
-            <select id="background" value={settings.backgroundMode}
-              onChange={(e) => update({ backgroundMode: e.target.value as BackgroundMode })}>
-              <option value="weather">Weather sky</option>
-              <option value="photo">Photo gallery</option>
-            </select>
+            <Section title="Live scene">
+              <div className="scene-grid">
+                {SCENE_ORDER.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={settings.preview === p ? 'scene-chip active' : 'scene-chip'}
+                    onClick={() => update({ preview: p })}
+                  >
+                    <span className="ico">{SCENE_META[p].ico}</span>
+                    {SCENE_META[p].label}
+                  </button>
+                ))}
+              </div>
+            </Section>
 
-            <label htmlFor="preview" style={field}>Preview scene</label>
-            <select id="preview" value={settings.preview}
-              onChange={(e) => update({ preview: e.target.value as Preview })}>
-              <option value="live">Live (real weather)</option>
-              {DEMO_NAMES.map((n) => (
-                <option key={n} value={n}>{n[0].toUpperCase() + n.slice(1)}</option>
+            <Section title="Clock & units">
+              <div className="set-col">
+                <span id="units-label" className="set-label">Units</span>
+                <div role="group" aria-labelledby="units-label">
+                  <Segmented<Units>
+                    wide value={settings.units}
+                    options={[{ value: 'metric', label: 'Metric °C' }, { value: 'imperial', label: 'Imperial °F' }]}
+                    onChange={(units) => update({ units })}
+                  />
+                </div>
+              </div>
+              <div className="set-row">
+                <Toggle label="12-hour clock" checked={settings.hour12} onChange={(hour12) => update({ hour12 })} />
+              </div>
+            </Section>
+
+            <Section title="Location">
+              <div className="set-col">
+                <span className="set-label">Search city</span>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    className="set-input"
+                    placeholder={settings.location?.name ?? 'Auto-detected'}
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') searchCity() }}
+                  />
+                  <button className="set-btn" onClick={searchCity}>Search</button>
+                </div>
+              </div>
+              <div className="set-col">
+                <button className="set-btn block" onClick={() => update({ location: null })}>Use auto-detected location</button>
+              </div>
+              <div className="set-col">
+                <label htmlFor="country" className="set-label">Holiday country (ISO-2)</label>
+                <input
+                  id="country" className="set-input" value={settings.holidayCountry} maxLength={2}
+                  onChange={(e) => update({ holidayCountry: e.target.value.toUpperCase() })}
+                />
+              </div>
+            </Section>
+
+            <Section title="Tiles">
+              {(Object.keys(TILE_LABELS) as TileId[]).map((id) => (
+                <div className="set-row" key={id}>
+                  <Toggle
+                    label={TILE_LABELS[id]}
+                    checked={settings.enabledTiles[id]}
+                    onChange={(on) => update({ enabledTiles: { ...settings.enabledTiles, [id]: on } })}
+                  />
+                </div>
               ))}
-            </select>
+            </Section>
 
-            <label htmlFor="performance" style={field}>Performance</label>
-            <select id="performance" value={settings.performance}
-              onChange={(e) => update({ performance: e.target.value as Performance })}>
-              <option value="high">High</option>
-              <option value="low">Low</option>
-            </select>
-
-            <label htmlFor="units" style={field}>Units</label>
-            <select id="units" value={settings.units}
-              onChange={(e) => update({ units: e.target.value as Units })}>
-              <option value="metric">Metric (°C)</option>
-              <option value="imperial">Imperial (°F)</option>
-            </select>
-
-            <label style={{ ...field, display: 'flex', gap: 8, alignItems: 'center' }}>
-              <input type="checkbox" checked={settings.hour12}
-                onChange={(e) => update({ hour12: e.target.checked })} />
-              12-hour clock
-            </label>
-
-            <label htmlFor="country" style={field}>Holiday country (ISO-2)</label>
-            <input id="country" value={settings.holidayCountry} maxLength={2}
-              onChange={(e) => update({ holidayCountry: e.target.value.toUpperCase() })} />
-
-            <label htmlFor="city" style={field}>Location</label>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <input id="city" placeholder={settings.location?.name ?? 'Auto-detected'}
-                value={city} onChange={(e) => setCity(e.target.value)} />
-              <button onClick={searchCity}>Search</button>
-            </div>
-            <button style={{ marginTop: 6 }} onClick={() => update({ location: null })}>Auto-detect</button>
-
-            <div style={field}>Tiles</div>
-            {(Object.keys(TILE_LABELS) as TileId[]).map((id) => (
-              <label key={id} style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '4px 0' }}>
-                <input type="checkbox" checked={settings.enabledTiles[id]}
-                  onChange={(e) => update({ enabledTiles: { ...settings.enabledTiles, [id]: e.target.checked } })} />
-                {TILE_LABELS[id]}
-              </label>
-            ))}
-
-            <div style={field}>Export / Import config</div>
-            <textarea readOnly value={encodeConfig(settings)} rows={3}
-              style={{ width: '100%', fontSize: '0.7rem' }} />
-            <textarea placeholder="Paste config to import" rows={3} value={importText}
-              onChange={(e) => setImportText(e.target.value)} style={{ width: '100%', fontSize: '0.7rem', marginTop: 6 }} />
-            <button style={{ marginTop: 6 }} onClick={() => { const c = decodeConfig(importText); if (c) update(c) }}>
-              Apply imported config
-            </button>
+            <Section title="Backup">
+              <div className="set-col">
+                <span className="set-label">Export this screen's config</span>
+                <textarea className="set-input" readOnly value={encodeConfig(settings)} rows={3} />
+              </div>
+              <div className="set-col">
+                <span className="set-label">Import config</span>
+                <textarea
+                  className="set-input" placeholder="Paste config here" rows={3}
+                  value={importText} onChange={(e) => setImportText(e.target.value)}
+                />
+                <button
+                  className="set-btn primary block" style={{ marginTop: 8 }}
+                  onClick={() => { const c = decodeConfig(importText); if (c) { update(c); setImportText('') } }}
+                >
+                  Apply imported config
+                </button>
+              </div>
+            </Section>
           </div>
         </div>
       )}

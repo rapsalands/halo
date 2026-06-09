@@ -25,7 +25,14 @@ describe('SettingsPanel', () => {
   it('changes units', async () => {
     render(<SettingsPanel />)
     await userEvent.click(screen.getByRole('button', { name: /settings/i }))
-    await userEvent.selectOptions(screen.getByLabelText(/units/i), 'imperial')
+    await userEvent.click(screen.getByRole('button', { name: /imperial/i }))
     expect(useSettings.getState().settings.units).toBe('imperial')
+  })
+
+  it('changes the accent color', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: /settings/i }))
+    await userEvent.click(screen.getByRole('button', { name: /accent #9db4ff/i }))
+    expect(useSettings.getState().settings.accent).toBe('#9db4ff')
   })
 })

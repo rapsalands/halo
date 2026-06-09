@@ -18,7 +18,14 @@ export interface Settings {
   enabledTiles: Record<TileId, boolean>
   location: { lat: number; lon: number; name: string } | null // null = auto-detect
   preview: Preview
+  /** UI accent (hex) — tints tiles, calendar "today" and settings chrome. */
+  accent: string
 }
+
+/** Curated accent swatches shown in settings; first is the default. */
+export const ACCENT_SWATCHES = [
+  '#7fd0ff', '#9db4ff', '#7cf5c0', '#ffd56b', '#ff9e6d', '#ff8fb1', '#c9a7ff',
+] as const
 
 export const DEFAULT_SETTINGS: Settings = {
   layout: 'photo-first',
@@ -33,4 +40,5 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   location: null,
   preview: 'live',
+  accent: '#7fd0ff',
 }
