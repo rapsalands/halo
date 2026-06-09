@@ -20,12 +20,21 @@ export function SkyGradient({ sky, accent }: Props) {
           transition: 'background 2s ease',
         }}
       />
+      {/* accent-tinted airglow rising from the horizon — gives the night sky depth */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(120% 55% at 50% 118%, ${accent ?? '#ffffff'}2e 0%, transparent 62%)`,
+          transition: 'background 2s ease',
+        }}
+      />
       {/* gentle vignette to focus the centre */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(130% 120% at 50% 45%, transparent 55%, rgba(0,0,0,0.35) 100%)',
+          background: 'radial-gradient(135% 125% at 50% 45%, transparent 62%, rgba(0,0,0,0.28) 100%)',
         }}
       />
     </div>

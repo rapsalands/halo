@@ -4,7 +4,9 @@ export type Performance = 'low' | 'high'
 export type LayoutPreset = 'photo-first' | 'bento'
 export type TileId = 'clock' | 'weather' | 'calendar' | 'sunmoon' | 'quote' | 'ticker'
 /** Preview scene override: 'live' uses real weather; others force a demo scene. */
-export type Preview = 'live' | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
+export type Preview =
+  | 'live' | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
+  | 'night-rain' | 'night-thunder'
 
 export interface Settings {
   layout: LayoutPreset

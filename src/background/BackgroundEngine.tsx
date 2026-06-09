@@ -25,6 +25,7 @@ export function BackgroundEngine() {
   const sky = result?.palette.sky ?? fallback.sky
   const scene = result?.scene ?? fallback.scene
   const accent = result?.palette.accent ?? fallback.accent
+  const night = result?.dayPart === 'night'
   const photoMode = backgroundMode === 'photo'
 
   return (
@@ -35,7 +36,7 @@ export function BackgroundEngine() {
         <>
           <SkyGradient sky={sky} accent={accent} />
           <AuroraGlow accent={accent} />
-          <Celestial scene={scene} now={now} />
+          <Celestial scene={scene} now={now} night={night} />
           <Clouds scene={scene} />
         </>
       )}

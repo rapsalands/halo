@@ -2,7 +2,9 @@ import type { Weather, DailyForecast, HourlyForecast } from '../store/appState'
 
 export interface DemoOverride { code: number; isDay: boolean }
 
-export type DemoName = 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
+export type DemoName =
+  | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
+  | 'night-rain' | 'night-thunder'
 
 /** Named preview presets → a representative WMO code + day/night. */
 export const DEMO_PRESETS: Record<DemoName, DemoOverride> = {
@@ -13,6 +15,8 @@ export const DEMO_PRESETS: Record<DemoName, DemoOverride> = {
   night: { code: 0, isDay: false },
   cloudy: { code: 3, isDay: true },
   fog: { code: 45, isDay: true },
+  'night-rain': { code: 63, isDay: false },
+  'night-thunder': { code: 95, isDay: false },
 }
 
 export const DEMO_NAMES = Object.keys(DEMO_PRESETS) as DemoName[]

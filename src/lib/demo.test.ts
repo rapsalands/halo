@@ -26,6 +26,10 @@ describe('overrideFor', () => {
     expect(overrideFor('live')).toBeNull()
     expect(overrideFor('thunder')).toEqual({ code: 95, isDay: true })
   })
+  it('exposes night-weather combos as night presets', () => {
+    expect(overrideFor('night-rain')).toEqual({ code: 63, isDay: false })
+    expect(overrideFor('night-thunder')).toEqual({ code: 95, isDay: false })
+  })
 })
 
 describe('applyDemo', () => {
