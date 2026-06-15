@@ -26,11 +26,11 @@ export function CalendarTile() {
   const holidays = new Map((data ?? []).map((h) => [h.date, h.name]))
 
   return (
-    <TileFrame style={{ minWidth: 380 }}>
-      <div style={{ fontWeight: 800, fontSize: '1.5rem', marginBottom: 12 }}>
+    <TileFrame>
+      <div style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: 8 }}>
         {MONTHS[month]} {year}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, textAlign: 'center' }}>
         {DOW.map((d, i) => (
           <div key={i} style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', paddingBottom: 4 }}>{d}</div>
         ))}
@@ -46,16 +46,16 @@ export function CalendarTile() {
               title={holidayName}
               style={{
                 position: 'relative',
-                height: 46,
+                height: 34,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
-                paddingTop: 4,
+                paddingTop: 3,
                 opacity: c.inMonth ? 1 : 0.28,
                 borderRadius: 10,
                 background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,120,120,0.18)' : 'transparent',
                 color: isToday ? '#0b0f1a' : 'inherit',
               }}
             >
-              <span style={{ fontSize: '1.05rem', fontWeight: isToday ? 800 : 500 }}>{c.day}</span>
+              <span style={{ fontSize: '0.95rem', fontWeight: isToday ? 800 : 500 }}>{c.day}</span>
               {isHoliday && (
                 <>
                   <span

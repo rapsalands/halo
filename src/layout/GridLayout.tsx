@@ -18,12 +18,13 @@ const PLACEMENT: Record<RegionId, CSSProperties> = {
   clock:    { gridColumn: '1 / 8',  gridRow: '1 / 2' },
   weather:  { gridColumn: '1 / 5',  gridRow: '2 / 3' },
   air:      { gridColumn: '5 / 8',  gridRow: '2 / 3' },
-  calendar: { gridColumn: '1 / 3',  gridRow: '3 / 4' },
-  quote:    { gridColumn: '3 / 6',  gridRow: '3 / 4' },
-  sunmoon:  { gridColumn: '6 / 8',  gridRow: '3 / 4' },
-  forecast: { gridColumn: '1 / 8',  gridRow: '4 / 5' },
-  photo:    { gridColumn: '8 / 13', gridRow: '1 / 5' },
-  ticker:   { gridColumn: '1 / 13', gridRow: '5 / 6' },
+  // Calendar is the tallest tile (full month grid) — give it 3 cols and 2 rows.
+  calendar: { gridColumn: '1 / 4',  gridRow: '3 / 5' },
+  quote:    { gridColumn: '4 / 8',  gridRow: '3 / 4' },
+  sunmoon:  { gridColumn: '4 / 8',  gridRow: '4 / 5' },
+  forecast: { gridColumn: '1 / 8',  gridRow: '5 / 6' },
+  photo:    { gridColumn: '8 / 13', gridRow: '1 / 6' },
+  ticker:   { gridColumn: '1 / 13', gridRow: '6 / 7' },
 }
 
 const RENDER: Record<RegionId, () => ReactNode> = {
@@ -70,7 +71,7 @@ export function GridLayout() {
         position: 'absolute', inset: 0, zIndex: 1,
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
-        gridTemplateRows: '1.5fr 1fr 1.1fr 0.85fr auto',
+        gridTemplateRows: '1.1fr 1fr 1fr 1fr 0.8fr auto',
         gap: 16,
         padding: 24,
         boxSizing: 'border-box',
