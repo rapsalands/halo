@@ -116,6 +116,9 @@ export function SettingsPanel() {
                   onChange={(performance) => update({ performance })}
                 />
               </div>
+              <div className="set-row">
+                <Toggle label="Companion (sun / moon)" checked={settings.companion} onChange={(companion) => update({ companion })} />
+              </div>
               <div className="set-col">
                 <span className="set-label">Accent color</span>
                 <div className="swatches">
