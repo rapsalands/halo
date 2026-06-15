@@ -62,3 +62,23 @@ export function selectScene(weather: Weather, now: Date): SceneResult {
     : ACCENTS[dayPart]
   return { scene, dayPart, palette: { sky, accent } }
 }
+
+export interface ResolvedScene {
+  sky: [string, string]
+  scene: Scene
+  accent: string
+  night: boolean
+}
+
+/**
+ * Resolve the full background context, including a sensible default before the
+ * first weather load. Shared by BackgroundEngine and WeatherEffectsOverlay so
+ * the sky and the effects always agree on the active scene.
+ */
+export function resolveScene(weather: Weather | null, now: Date): ResolvedScene {
+  if (!weather) {
+    return { sky: ['#1a2238', '#2a3658'], scene: 'cloudy', accent: '#7fd0ff', night: false }
+  }
+  const r = selectScene(weather, now)
+  return { sky: r.palette.sky, scene: r.scene, accent: r.palette.accent, night: r.dayPart === 'night' }
+}
