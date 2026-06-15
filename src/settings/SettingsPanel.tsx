@@ -2,8 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { useSettings } from '../store/settings'
 import {
   ACCENT_SWATCHES, TICKER_CURRENCIES,
-  type TileId, type Units, type Performance, type BackgroundMode,
-  type LayoutPreset, type Preview,
+  type TileId, type Units, type Performance, type Preview,
 } from '../store/defaults'
 import { DEMO_NAMES } from '../lib/demo'
 import { geocodeCity } from '../data/geo'
@@ -109,22 +108,6 @@ export function SettingsPanel() {
             </div>
 
             <Section title="Appearance">
-              <div className="set-col">
-                <span className="set-label">Layout</span>
-                <Segmented<LayoutPreset>
-                  wide value={settings.layout}
-                  options={[{ value: 'photo-first', label: 'Photo-first' }, { value: 'bento', label: 'Bento' }]}
-                  onChange={(layout) => update({ layout })}
-                />
-              </div>
-              <div className="set-col">
-                <span className="set-label">Background</span>
-                <Segmented<BackgroundMode>
-                  wide value={settings.backgroundMode}
-                  options={[{ value: 'weather', label: 'Weather sky' }, { value: 'photo', label: 'Photo gallery' }]}
-                  onChange={(backgroundMode) => update({ backgroundMode })}
-                />
-              </div>
               <div className="set-col">
                 <span className="set-label">Performance</span>
                 <Segmented<Performance>
