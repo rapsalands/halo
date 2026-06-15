@@ -24,6 +24,8 @@ export interface Settings {
   greetingName: string
   /** Show seconds on the big clock. */
   showSeconds: boolean
+  /** Show the drifting sun/moon "companion" animation in the sky. */
+  companion: boolean
   /** Auto-dim the whole panel overnight (kiosk-friendly). */
   nightDim: boolean
   dimStart: number // hour 0–23 the dimming begins
@@ -59,6 +61,7 @@ export const DEFAULT_SETTINGS: Settings = {
   accent: '#7fd0ff',
   greetingName: '',
   showSeconds: false,
+  companion: true,
   nightDim: false,
   dimStart: 23,
   dimEnd: 6,
