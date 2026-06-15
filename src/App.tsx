@@ -4,8 +4,7 @@ import { useSettings } from './store/settings'
 import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
 import { NightDim } from './background/NightDim'
-import { LayoutRenderer } from './layout/LayoutRenderer'
-import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
+import { GridLayout } from './layout/GridLayout'
 import { fetchWithFallback } from './lib/fetchWithFallback'
 import { ipLocate } from './data/geo'
 import { fetchWeather } from './data/weather'
@@ -98,8 +97,7 @@ export default function App() {
       style={{ position: 'absolute', inset: 0, '--accent': accent } as CSSProperties}
     >
       <BackgroundEngine />
-      <LayoutRenderer />
-      <WeatherEffectsOverlay />
+      <GridLayout />
       <NightDim />
       <StaleBadge />
       <SettingsPanel />
