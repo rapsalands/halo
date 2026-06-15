@@ -15,9 +15,9 @@ describe('BackgroundEngine', () => {
     useAppState.setState({ weather: clearDay, now: new Date('2026-06-06T12:00:00') })
   })
 
-  it('renders a sky layer and a canvas', () => {
+  it('renders a sky layer and no longer owns the effects canvas', () => {
     const { container } = render(<BackgroundEngine />)
-    expect(container.querySelector('canvas')).toBeInTheDocument()
+    expect(container.querySelector('canvas')).toBeNull()
     expect(container.firstChild).toBeTruthy()
   })
 

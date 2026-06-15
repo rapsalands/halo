@@ -5,6 +5,7 @@ import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
 import { NightDim } from './background/NightDim'
 import { LayoutRenderer } from './layout/LayoutRenderer'
+import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
 import { fetchWithFallback } from './lib/fetchWithFallback'
 import { ipLocate } from './data/geo'
 import { fetchWeather } from './data/weather'
@@ -98,6 +99,7 @@ export default function App() {
     >
       <BackgroundEngine />
       <LayoutRenderer />
+      <WeatherEffectsOverlay />
       <NightDim />
       <StaleBadge />
       <SettingsPanel />
