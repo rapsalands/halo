@@ -26,13 +26,13 @@ export function CalendarTile() {
   const holidays = new Map((data ?? []).map((h) => [h.date, h.name]))
 
   return (
-    <TileFrame>
-      <div style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: 8 }}>
+    <TileFrame justify="flex-start">
+      <div style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.4rem' }}>
         {MONTHS[month]} {year}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, textAlign: 'center' }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'auto repeat(6, 1fr)', gap: '0.2rem', textAlign: 'center' }}>
         {DOW.map((d, i) => (
-          <div key={i} style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', paddingBottom: 4 }}>{d}</div>
+          <div key={i} style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-dim)', paddingBottom: '0.2rem' }}>{d}</div>
         ))}
         {grid.map((c) => {
           const isToday = c.iso === todayIso
@@ -46,11 +46,10 @@ export function CalendarTile() {
               title={holidayName}
               style={{
                 position: 'relative',
-                height: 34,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
-                paddingTop: 3,
+                minHeight: 0,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 opacity: c.inMonth ? 1 : 0.28,
-                borderRadius: 10,
+                borderRadius: '0.5rem',
                 background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,120,120,0.18)' : 'transparent',
                 color: isToday ? '#0b0f1a' : 'inherit',
               }}

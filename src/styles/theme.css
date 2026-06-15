@@ -2,7 +2,7 @@
 
 :root {
   --glass-bg: rgba(24, 28, 42, 0.34);
-  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.10);
   --glass-blur: 16px;
   --accent: #7fd0ff;
   --mood: #7fd0ff;
@@ -12,23 +12,28 @@
 
 .glass {
   position: relative;
-  /* Frosted base + a quiet mood tint pulled from the active scene accent. */
+  /* Column flex so each tile can distribute its own content over the full
+     card height (header top / body fill) instead of clustering at the top. */
+  display: flex;
+  flex-direction: column;
+  /* Frosted base + a bold, scene-coloured glow from the upper-right corner so
+     every card reads as weather/time lit rather than flat. */
   background-color: var(--glass-bg);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--mood) 16%, transparent) 0%,
-    transparent 62%
+  background-image: radial-gradient(
+    130% 100% at 88% -20%,
+    color-mix(in srgb, var(--mood) 15%, transparent) 0%,
+    transparent 55%
   );
   backdrop-filter: blur(var(--glass-blur)) saturate(120%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
+  border-radius: 1.1rem;
   /* Clip content to the rounded card so nothing bleeds onto neighbouring tiles. */
   overflow: hidden;
-  /* Flat: drop shadow only, no inset emboss/bevel. */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+  /* Flat: soft drop shadow only, no hard emboss/bevel. */
+  box-shadow: 0 0.5rem 1.8rem rgba(0, 0, 0, 0.22);
   color: var(--text);
-  padding: 24px 28px;
+  padding: 1.4rem 1.6rem;
 }
 
 /* Low performance mode disables the expensive blur and leans opaque. */

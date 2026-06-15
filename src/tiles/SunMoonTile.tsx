@@ -19,7 +19,7 @@ export function SunMoonTile() {
 
   const row = { display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', margin: '4px 0' } as const
   return (
-    <TileFrame>
+    <TileFrame justify="space-between">
       <div style={row}><span style={{ color: 'var(--text-dim)' }}>Sunrise</span><span>{hhmm(weather.sunriseToday)}</span></div>
       <div style={row}><span style={{ color: 'var(--text-dim)' }}>Sunset</span><span>{hhmm(weather.sunsetToday)}</span></div>
       <div style={row}>

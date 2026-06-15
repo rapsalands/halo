@@ -22,7 +22,7 @@ export function TickerTile() {
   return (
     <div
       className="glass"
-      style={{ display: 'flex', gap: 32, alignItems: 'center', padding: '12px 26px', overflow: 'hidden', whiteSpace: 'nowrap' }}
+      style={{ display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'center', padding: '0.55rem 1.6rem', overflow: 'hidden', whiteSpace: 'nowrap' }}
     >
       {coins.map((c) => {
         const up = c.change24h >= 0

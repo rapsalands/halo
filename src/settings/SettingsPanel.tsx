@@ -169,7 +169,7 @@ export function SettingsPanel() {
               <div className="set-col">
                 <label htmlFor="greet" className="set-label">Greeting name</label>
                 <input
-                  id="greet" className="set-input" placeholder="e.g. Sandeep"
+                  id="greet" className="set-input" placeholder="eg: Marsh Mellow"
                   value={settings.greetingName} maxLength={24}
                   onChange={(e) => update({ greetingName: e.target.value })}
                 />
