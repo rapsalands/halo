@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectScene } from './scene'
+import { selectScene, resolveScene } from './scene'
 import type { Weather } from '../store/appState'
 
 function weather(over: Partial<Weather>): Weather {
@@ -32,5 +32,21 @@ describe('selectScene', () => {
   it('warms the accent at dusk', () => {
     const s = selectScene(weather({ code: 0 }), new Date('2026-06-06T19:15:00'))
     expect(s.dayPart).toBe('dusk')
+  })
+})
+
+describe('resolveScene', () => {
+  it('falls back to a cloudy daytime scene when weather is null', () => {
+    const r = resolveScene(null, new Date('2026-06-06T12:00:00'))
+    expect(r.scene).toBe('cloudy')
+    expect(r.night).toBe(false)
+    expect(r.sky).toHaveLength(2)
+    expect(r.accent).toMatch(/^#|rgb/)
+  })
+
+  it('derives scene, accent and night flag from real weather', () => {
+    const r = resolveScene(weather({ code: 0, isDay: false }), new Date('2026-06-06T23:00:00'))
+    expect(r.scene).toBe('clear-night')
+    expect(r.night).toBe(true)
   })
 })

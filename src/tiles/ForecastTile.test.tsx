@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { WeatherTile } from './WeatherTile'
+import { ForecastTile } from './ForecastTile'
 import { useAppState, type Weather } from '../store/appState'
 import { useSettings } from '../store/settings'
 
@@ -11,31 +11,29 @@ const W: Weather = {
     { date: '2026-06-06', code: 3, tempMax: 27, tempMin: 18, sunrise: '', sunset: '', uvMax: 6 },
     { date: '2026-06-07', code: 0, tempMax: 29, tempMin: 19, sunrise: '', sunset: '', uvMax: 7 },
   ],
-  hourly: [],
-  stale: false,
+  hourly: [], stale: false,
 }
 
-describe('WeatherTile', () => {
+describe('ForecastTile', () => {
   beforeEach(() => {
     useSettings.getState().reset()
     useAppState.setState({ weather: W })
   })
 
-  it('shows current temperature in metric with the condition label', () => {
-    render(<WeatherTile />)
-    expect(screen.getByText('24°')).toBeInTheDocument()
-    expect(screen.getByText('Overcast')).toBeInTheDocument()
+  it('renders one column per forecast day', () => {
+    render(<ForecastTile />)
+    expect(screen.getAllByTestId('forecast-day')).toHaveLength(2)
   })
 
-  it('converts to Fahrenheit in imperial mode', () => {
+  it('converts highs to Fahrenheit in imperial mode', () => {
     useSettings.getState().update({ units: 'imperial' })
-    render(<WeatherTile />)
-    expect(screen.getByText('75°')).toBeInTheDocument() // 24C → 75F
+    render(<ForecastTile />)
+    expect(screen.getByText('81°')).toBeInTheDocument() // 27C → 81F
   })
 
-  it('shows a placeholder when weather is missing', () => {
+  it('renders nothing when there is no weather', () => {
     useAppState.setState({ weather: null })
-    render(<WeatherTile />)
-    expect(screen.getByText(/weather unavailable/i)).toBeInTheDocument()
+    const { container } = render(<ForecastTile />)
+    expect(container.querySelector('[data-testid="forecast-day"]')).toBeNull()
   })
 })
