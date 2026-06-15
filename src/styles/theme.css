@@ -23,6 +23,8 @@
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
   border: 1px solid var(--glass-border);
   border-radius: 18px;
+  /* Clip content to the rounded card so nothing bleeds onto neighbouring tiles. */
+  overflow: hidden;
   /* Flat: drop shadow only, no inset emboss/bevel. */
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
   color: var(--text);
