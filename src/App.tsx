@@ -3,6 +3,7 @@ import { useClock } from './hooks/useClock'
 import { useSettings } from './store/settings'
 import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
+import { resolveScene } from './background/scene'
 import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
 import { NightDim } from './background/NightDim'
 import { GridLayout } from './layout/GridLayout'
@@ -74,6 +75,9 @@ export default function App() {
 
   // Poll weather whenever the location changes, then on an interval.
   const location = useAppState((s) => s.location)
+  const weatherForMood = useAppState((s) => s.weather)
+  const nowForMood = useAppState((s) => s.now)
+  const mood = resolveScene(weatherForMood, nowForMood).accent
   useEffect(() => {
     if (!location) return
     let cancelled = false
@@ -95,7 +99,7 @@ export default function App() {
   return (
     <div
       className={performance === 'low' ? 'perf-low' : undefined}
-      style={{ position: 'absolute', inset: 0, '--accent': accent } as CSSProperties}
+      style={{ position: 'absolute', inset: 0, '--accent': accent, '--mood': mood } as CSSProperties}
     >
       <BackgroundEngine />
       <GridLayout />
