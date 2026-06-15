@@ -7,11 +7,6 @@ import { formatClock } from '../lib/time'
 
 const toF = (c: number) => Math.round((c * 9) / 5 + 32)
 
-function weekday(dateStr: string): string {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  return days[new Date(dateStr).getDay()]
-}
-
 export function WeatherTile() {
   const weather = useAppState((s) => s.weather)
   const units = useSettings((s) => s.settings.units)
@@ -57,17 +52,6 @@ export function WeatherTile() {
           ))}
         </div>
       )}
-
-      <div style={{ display: 'flex', gap: 16, marginTop: 14, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 12 }}>
-        {daily.map((d) => (
-          <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.8rem' }}>
-            <div style={{ color: 'var(--text-dim)' }}>{weekday(d.date)}</div>
-            <WeatherIcon code={d.code} isDay={true} size={28} />
-            <div style={{ fontWeight: 600 }}>{conv(d.tempMax)}°</div>
-            <div style={{ color: 'var(--text-dim)' }}>{conv(d.tempMin)}°</div>
-          </div>
-        ))}
-      </div>
     </TileFrame>
   )
 }
