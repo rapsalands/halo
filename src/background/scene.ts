@@ -17,7 +17,7 @@ export interface SceneResult {
 
 const SKIES: Record<Scene, Record<DayPart, [string, string]>> = {
   'clear-day': {
-    dawn: ['#ff9a76', '#ffd9a0'], day: ['#4a90e2', '#a7d3ff'],
+    dawn: ['#ff9a76', '#ffd9a0'], day: ['#3a6390', '#7ba7cf'],
     dusk: ['#ff7e5f', '#feb47b'], night: ['#0d1c44', '#16306a'],
   },
   'clear-night': {
