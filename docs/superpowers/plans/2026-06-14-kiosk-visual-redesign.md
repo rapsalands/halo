@@ -233,34 +233,15 @@ export function BackgroundEngine() {
   })
 ```
 
-- [ ] **Step 7: Mount the overlay in `App` (keep the suite green now, not at Task 6)**
+- [ ] **Step 7: Run the affected tests**
 
-Removing the canvas from `BackgroundEngine` would leave `App.test` (which asserts a canvas exists) red until the overlay is mounted. Mount it now. In `src/App.tsx`, add the import after the other background imports (after line 7):
+Run: `npx vitest run src/background/BackgroundEngine.test.tsx src/background/WeatherEffectsOverlay.test.tsx`
+Expected: PASS.
 
-```tsx
-import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
-```
-
-and in the returned JSX add `<WeatherEffectsOverlay />` immediately after `<LayoutRenderer />`:
-
-```tsx
-      <BackgroundEngine />
-      <LayoutRenderer />
-      <WeatherEffectsOverlay />
-      <NightDim />
-```
-
-(`LayoutRenderer` is still in place here; Task 5 swaps it for `GridLayout`.)
-
-- [ ] **Step 8: Run the full suite**
-
-Run: `npm test`
-Expected: PASS — `BackgroundEngine` no longer renders a canvas, but `App` does (via the overlay), so `App.test` stays green.
-
-- [ ] **Step 9: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add src/background/WeatherEffectsOverlay.tsx src/background/WeatherEffectsOverlay.test.tsx src/background/BackgroundEngine.tsx src/background/BackgroundEngine.test.tsx src/App.tsx
+git add src/background/WeatherEffectsOverlay.tsx src/background/WeatherEffectsOverlay.test.tsx src/background/BackgroundEngine.tsx src/background/BackgroundEngine.test.tsx
 git commit -m "feat(background): full-screen weather effects overlay
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
@@ -642,20 +623,19 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Task 6: Drive the `--mood` variable from the active scene
-
-The effects overlay is already mounted (Task 2) and `GridLayout` is already wired (Task 5). This task only adds the scene-derived `--mood` CSS variable that tints the glass.
+## Task 6: Mount the effects overlay + drive the `--mood` variable
 
 **Files:**
 - Modify: `src/App.tsx`
 
-- [ ] **Step 1: Add the mood plumbing to `App.tsx`.** Add this import near the other background imports (after the `WeatherEffectsOverlay` import added in Task 2):
+- [ ] **Step 1: Add the overlay import + mood plumbing to `App.tsx`.** Add these imports near the other background imports (after line 7):
 
 ```tsx
+import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
 import { resolveScene } from './background/scene'
 ```
 
-Inside the `App` component, after the existing `const location = useAppState((s) => s.location)` line, add:
+Inside the `App` component, after the existing `const location = useAppState((s) => s.location)` line (line 75), add:
 
 ```tsx
   const weatherForMood = useAppState((s) => s.weather)
@@ -663,19 +643,26 @@ Inside the `App` component, after the existing `const location = useAppState((s)
   const mood = resolveScene(weatherForMood, nowForMood).accent
 ```
 
-Then update the root `<div>` style to include `--mood` (leave the existing children — `BackgroundEngine`, `GridLayout`, `WeatherEffectsOverlay`, `NightDim`, `StaleBadge`, `SettingsPanel` — as they are):
+Then update the root `<div>` style (line 97) to include `--mood`, and add `<WeatherEffectsOverlay />` to the JSX after `<GridLayout />`:
 
 ```tsx
     <div
       className={performance === 'low' ? 'perf-low' : undefined}
       style={{ position: 'absolute', inset: 0, '--accent': accent, '--mood': mood } as CSSProperties}
     >
+      <BackgroundEngine />
+      <GridLayout />
+      <WeatherEffectsOverlay />
+      <NightDim />
+      <StaleBadge />
+      <SettingsPanel />
+    </div>
 ```
 
 - [ ] **Step 2: Run the smoke test**
 
 Run: `npx vitest run src/App.test.tsx`
-Expected: PASS — App still renders a canvas (from the overlay) and does not crash.
+Expected: PASS — App still renders a canvas (now from the overlay) and does not crash.
 
 - [ ] **Step 3: Run the full suite**
 
@@ -686,7 +673,7 @@ Expected: PASS.
 
 ```bash
 git add src/App.tsx
-git commit -m "feat(app): drive --mood tint variable from active scene
+git commit -m "feat(app): mount full-screen effects overlay and --mood tint var
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```
