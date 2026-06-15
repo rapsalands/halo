@@ -34,4 +34,5 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   background-color: rgba(20, 26, 40, 0.6);
+  background-image: none; /* plain solid panel — no blur to pair the tint with */
 }
