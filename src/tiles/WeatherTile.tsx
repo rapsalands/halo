@@ -24,7 +24,7 @@ export function WeatherTile() {
   return (
     <TileFrame style={{ minWidth: 320 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <WeatherIcon code={weather.code} isDay={weather.isDay} size={68} />
+        <WeatherIcon code={weather.code} isDay={weather.isDay} size={60} />
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
             <span style={{ fontSize: '3.6rem', fontWeight: 800, lineHeight: 1 }}>{conv(weather.temp)}°</span>
@@ -42,7 +42,7 @@ export function WeatherTile() {
       )}
 
       {hours.length > 0 && (
-        <div style={{ display: 'flex', gap: 14, marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 12 }}>
+        <div style={{ display: 'flex', gap: 14, marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 8 }}>
           {hours.map((h) => (
             <div key={h.time} style={{ textAlign: 'center', fontSize: '0.72rem' }}>
               <div style={{ color: 'var(--text-dim)' }}>{formatClock(new Date(h.time), hour12)}</div>

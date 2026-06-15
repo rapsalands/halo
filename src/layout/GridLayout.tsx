@@ -71,7 +71,7 @@ export function GridLayout() {
         position: 'absolute', inset: 0, zIndex: 1,
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
-        gridTemplateRows: '1.1fr 1fr 1fr 1fr 0.8fr auto',
+        gridTemplateRows: '1.1fr 1.15fr 0.95fr 0.85fr 0.7fr auto',
         gap: 16,
         padding: 24,
         boxSizing: 'border-box',
