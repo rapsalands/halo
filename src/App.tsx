@@ -3,6 +3,7 @@ import { useClock } from './hooks/useClock'
 import { useSettings } from './store/settings'
 import { useAppState, type Weather } from './store/appState'
 import { BackgroundEngine } from './background/BackgroundEngine'
+import { WeatherEffectsOverlay } from './background/WeatherEffectsOverlay'
 import { NightDim } from './background/NightDim'
 import { GridLayout } from './layout/GridLayout'
 import { fetchWithFallback } from './lib/fetchWithFallback'
@@ -98,6 +99,7 @@ export default function App() {
     >
       <BackgroundEngine />
       <GridLayout />
+      <WeatherEffectsOverlay />
       <NightDim />
       <StaleBadge />
       <SettingsPanel />
