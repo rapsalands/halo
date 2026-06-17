@@ -59,7 +59,9 @@ function Cell({ id, children }: { id: RegionId; children: ReactNode }) {
 // show a spinner or error; they reappear automatically once the link is back.
 const NEEDS_NET: Record<RegionId, boolean> = {
   clock: false, weather: true, air: true, calendar: false, quote: false,
-  sunmoon: false, forecast: true, photo: true, ticker: true,
+  // sunmoon shows sunrise/sunset/UV from the weather feed (only the moon phase is
+  // local), so it has nothing useful offline — hide it with the rest.
+  sunmoon: true, forecast: true, photo: true, ticker: true,
 }
 
 export function GridLayout() {

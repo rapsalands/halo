@@ -52,10 +52,10 @@ describe('GridLayout offline gating', () => {
   it('hides internet-dependent tiles when offline, keeps offline-capable ones', () => {
     setOnline(false)
     const { container } = render(<GridLayout />)
-    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker']) {
+    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker', 'sunmoon']) {
       expect(region(container, id)).toBeNull() // no spinners/errors offline
     }
-    for (const id of ['clock', 'calendar', 'quote', 'sunmoon']) {
+    for (const id of ['clock', 'calendar', 'quote']) {
       expect(region(container, id)).toBeInTheDocument()
     }
   })
@@ -63,7 +63,7 @@ describe('GridLayout offline gating', () => {
   it('shows the internet-dependent tiles when online', () => {
     setOnline(true)
     const { container } = render(<GridLayout />)
-    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker']) {
+    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker', 'sunmoon']) {
       expect(region(container, id)).toBeInTheDocument()
     }
   })
