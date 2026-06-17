@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { GridLayout } from './GridLayout'
 import { useSettings } from '../store/settings'
@@ -6,6 +6,10 @@ import { useAppState } from '../store/appState'
 
 function region(c: HTMLElement, id: string): HTMLElement | null {
   return c.querySelector(`[data-region="${id}"]`)
+}
+
+function setOnline(value: boolean) {
+  vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(value)
 }
 
 describe('GridLayout', () => {
@@ -35,5 +39,32 @@ describe('GridLayout', () => {
     expect(region(container, 'photo')).toBeInTheDocument()
     expect(region(container, 'weather')).toBeNull()
     expect(region(container, 'forecast')).toBeNull() // forecast follows the weather toggle
+  })
+})
+
+describe('GridLayout offline gating', () => {
+  beforeEach(() => {
+    useSettings.getState().reset()
+    useAppState.setState({ weather: null, now: new Date('2026-06-06T12:00:00') })
+  })
+  afterEach(() => vi.restoreAllMocks())
+
+  it('hides internet-dependent tiles when offline, keeps offline-capable ones', () => {
+    setOnline(false)
+    const { container } = render(<GridLayout />)
+    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker']) {
+      expect(region(container, id)).toBeNull() // no spinners/errors offline
+    }
+    for (const id of ['clock', 'calendar', 'quote', 'sunmoon']) {
+      expect(region(container, id)).toBeInTheDocument()
+    }
+  })
+
+  it('shows the internet-dependent tiles when online', () => {
+    setOnline(true)
+    const { container } = render(<GridLayout />)
+    for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker']) {
+      expect(region(container, id)).toBeInTheDocument()
+    }
   })
 })

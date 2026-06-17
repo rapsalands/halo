@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { useSettings } from '../store/settings'
+import { useOnline } from '../hooks/useOnline'
 import { ClockTile } from '../tiles/ClockTile'
 import { WeatherTile } from '../tiles/WeatherTile'
 import { ForecastTile } from '../tiles/ForecastTile'
@@ -54,16 +55,25 @@ function Cell({ id, children }: { id: RegionId; children: ReactNode }) {
   )
 }
 
+// Regions that need the internet. When offline they are hidden so they never
+// show a spinner or error; they reappear automatically once the link is back.
+const NEEDS_NET: Record<RegionId, boolean> = {
+  clock: false, weather: true, air: true, calendar: false, quote: false,
+  sunmoon: false, forecast: true, photo: true, ticker: true,
+}
+
 export function GridLayout() {
   const enabled = useSettings((s) => s.settings.enabledTiles)
+  const online = useOnline()
+  const show = (id: RegionId) => online || !NEEDS_NET[id]
 
-  // Which regions are visible. The photo panel is always on; the forecast band
-  // follows the weather toggle (it is the same data source).
+  // Which regions are visible. The photo panel is always on (when online); the
+  // forecast band follows the weather toggle (it is the same data source).
   const visible: RegionId[] = ([
     'clock', 'weather', 'air', 'calendar', 'quote', 'sunmoon', 'ticker',
-  ] as const).filter((id) => enabled[id])
-  if (enabled.weather) visible.push('forecast')
-  visible.push('photo')
+  ] as const).filter((id) => enabled[id] && show(id))
+  if (enabled.weather && show('forecast')) visible.push('forecast')
+  if (show('photo')) visible.push('photo')
 
   return (
     <div

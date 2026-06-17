@@ -12,6 +12,7 @@ import { ipLocate } from './data/geo'
 import { fetchWeather } from './data/weather'
 import { SettingsPanel } from './settings/SettingsPanel'
 import { StaleBadge } from './tiles/StaleBadge'
+import { OnboardingBanner } from './components/OnboardingBanner'
 import { useNightlyReload } from './hooks/useNightlyReload'
 import { readConfigFromSearch, readLocationFromSearch } from './settings/configIO'
 import { parseDemoName, overrideFor, applyDemo, synthDemoWeather } from './lib/demo'
@@ -106,6 +107,7 @@ export default function App() {
       <WeatherEffectsOverlay />
       <NightDim />
       <StaleBadge />
+      <OnboardingBanner />
       <SettingsPanel />
     </div>
   )

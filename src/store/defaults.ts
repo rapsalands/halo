@@ -33,6 +33,8 @@ export interface Settings {
   /** Markets ticker: which CoinGecko coin ids and the fiat to price them in. */
   tickerCoins: string[]
   tickerCurrency: string // 'usd' | 'eur' | 'inr' | 'gbp' | ...
+  /** Rolling onboarding banner with kiosk setup hints; off once the user dismisses it. */
+  showOnboardingBanner: boolean
 }
 
 /** Fiat currencies offered for the ticker → display symbol. */
@@ -67,4 +69,5 @@ export const DEFAULT_SETTINGS: Settings = {
   dimEnd: 6,
   tickerCoins: ['bitcoin', 'ethereum', 'solana'],
   tickerCurrency: 'usd',
+  showOnboardingBanner: true,
 }
