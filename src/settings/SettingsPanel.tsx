@@ -199,6 +199,12 @@ export function SettingsPanel() {
               </div>
             </Section>
 
+            <Section title="Kiosk">
+              <div className="set-row">
+                <Toggle label="Onboarding banner" checked={settings.showOnboardingBanner} onChange={(showOnboardingBanner) => update({ showOnboardingBanner })} />
+              </div>
+            </Section>
+
             <Section title="Markets ticker">
               <div className="set-col">
                 <label htmlFor="coins" className="set-label">Coins (CoinGecko ids, comma-separated)</label>
