@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -28,6 +28,18 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
+      # Publish the built dist/ as a downloadable tarball so the kiosk can bundle
+      # an offline copy of Halo (kiosk-system #26). Rolling release, replaced each push.
+      - name: Publish offline bundle (halo-dist.tar.gz)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf halo-dist.tar.gz -C dist .
+          gh release create dist-latest \
+            --title "Latest kiosk offline bundle" \
+            --notes "Rolling build of dist/ for kiosk offline bundling (kiosk-system #26). Auto-updated on each push to main." \
+            || true
+          gh release upload dist-latest halo-dist.tar.gz --clobber
 
   deploy:
     needs: build
