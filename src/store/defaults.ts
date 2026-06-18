@@ -17,6 +17,9 @@ export interface Settings {
   holidayCountry: string // ISO-3166 alpha-2, e.g. 'IN'
   enabledTiles: Record<TileId, boolean>
   location: { lat: number; lon: number; name: string } | null // null = auto-detect
+  /** IANA timezone fallback for the clock when there is no weather feed (offline).
+   *  The kiosk injects it via ?config=. Does NOT disable IP auto-detect. */
+  timezone: string | null
   preview: Preview
   /** UI accent (hex) — tints tiles, calendar "today" and settings chrome. */
   accent: string
@@ -59,6 +62,7 @@ export const DEFAULT_SETTINGS: Settings = {
     sunmoon: true, quote: true, ticker: true, air: true,
   },
   location: null,
+  timezone: null,
   preview: 'live',
   accent: '#7fd0ff',
   greetingName: '',

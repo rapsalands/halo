@@ -6,7 +6,9 @@ import { formatClock, formatLongDate, greeting } from '../lib/time'
  *  reads as intentional breathing room rather than an empty box. */
 export function ClockTile() {
   const now = useAppState((s) => s.now)
-  const tz = useAppState((s) => s.weather?.timezone)
+  const weatherTz = useAppState((s) => s.weather?.timezone)
+  const fallbackTz = useSettings((s) => s.settings.timezone)
+  const tz = weatherTz ?? fallbackTz ?? undefined
   const place = useAppState((s) => s.location?.name)
   const hour12 = useSettings((s) => s.settings.hour12)
   const showSeconds = useSettings((s) => s.settings.showSeconds)

@@ -66,8 +66,8 @@ export default function App() {
         const res = await fetchWithFallback('geo', ipLocate)
         if (!cancelled) useAppState.getState().setLocation(res.data)
       } catch {
-        // Last resort default so the app still renders a scene.
-        if (!cancelled) useAppState.getState().setLocation({ lat: 28.61, lon: 77.21, name: 'Delhi' })
+        // Neutral last-resort so the scene still renders, with no city label.
+        if (!cancelled) useAppState.getState().setLocation({ lat: 28.61, lon: 77.21, name: '' })
       }
     }
     resolve()

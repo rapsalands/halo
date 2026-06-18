@@ -33,4 +33,12 @@ describe('ClockTile', () => {
     expect(screen.getByText('05:00')).toBeInTheDocument()
     expect(screen.getByTestId('clock-location')).toHaveTextContent('San Francisco, CA')
   })
+
+  it('falls back to the configured timezone when there is no weather feed', () => {
+    // 12:00 UTC is 08:00 in New York (EDT, UTC-4) on this June date.
+    useAppState.setState({ now: new Date('2026-06-06T12:00:00Z'), weather: null, location: null })
+    useSettings.getState().update({ timezone: 'America/New_York' })
+    render(<ClockTile />)
+    expect(screen.getByText('08:00')).toBeInTheDocument()
+  })
 })
