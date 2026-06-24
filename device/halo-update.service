@@ -1,0 +1,9 @@
+[Unit]
+Description=Halo self-update (fetch the latest bundle when online)
+# Only meaningful with connectivity; the script itself no-ops when offline.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/content/halo/halo-update.sh

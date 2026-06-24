@@ -28,16 +28,23 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
-      # Publish the built dist/ as a downloadable tarball so the kiosk can bundle
-      # an offline copy of Halo (kiosk-system #26). Rolling release, replaced each push.
+      # Publish a SELF-CONTAINED product artifact for KioskOS's generic product
+      # installer: dist/ + product.yaml (self-description) + product-owned systemd
+      # units + the self-updater. KioskOS reads product.yaml and wires the device
+      # generically — it has no Halo-specific code. Rolling release, replaced each push.
       - name: Publish offline bundle (halo-dist.tar.gz)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tar -czf halo-dist.tar.gz -C dist .
+          mkdir -p pkg/dist
+          cp -a dist/. pkg/dist/
+          cp device/product.yaml device/halo.service device/halo-update.sh \
+             device/halo-update.service device/halo-update.timer pkg/
+          chmod +x pkg/halo-update.sh
+          tar -czf halo-dist.tar.gz -C pkg .
           gh release create dist-latest \
             --title "Latest kiosk offline bundle" \
-            --notes "Rolling build of dist/ for kiosk offline bundling (kiosk-system #26). Auto-updated on each push to main." \
+            --notes "Rolling product bundle (dist/ + product.yaml + units + self-updater) for KioskOS offline bundling. Auto-updated on each push to main." \
             || true
           gh release upload dist-latest halo-dist.tar.gz --clobber
 

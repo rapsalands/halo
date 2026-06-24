@@ -1,0 +1,23 @@
+[Unit]
+Description=Halo dashboard (independent offline product, served on loopback)
+Documentation=https://github.com/rapsalands/halo
+# Halo launches itself; the KioskOS orchestrator never starts it. The OS points
+# the content surface at the loopback URL and gates its splash until Halo is up,
+# so no ordering dependency on the OS is required.
+After=network.target
+# Restart=always must mean always — never let the rate-limiter park it failed.
+StartLimitIntervalSec=0
+
+[Service]
+# Least privilege: serve static files as the unprivileged kiosk user.
+User=kiosk
+Group=kiosk
+# Pure static SPA on loopback only (never exposed on the network). The dist is
+# baked at flash time and refreshed in place by halo-update; built-in Python
+# mimetypes cover all asset types, so a minimal rootfs needs no /etc/mime.types.
+ExecStart=/usr/bin/python3 -m http.server 8090 --bind 127.0.0.1 --directory /opt/content/halo/dist
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
