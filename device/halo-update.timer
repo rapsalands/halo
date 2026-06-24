@@ -1,0 +1,12 @@
+[Unit]
+Description=Periodic Halo self-update check
+
+[Timer]
+# Check shortly after boot (catches "updates itself on first internet
+# connection") and periodically thereafter; Persistent catches missed runs.
+OnBootSec=2min
+OnUnitActiveSec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

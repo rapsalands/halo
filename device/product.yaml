@@ -1,0 +1,15 @@
+# Halo's self-description for the KioskOS generic product installer.
+#
+# KioskOS knows nothing about "Halo" — it reads this manifest from the published
+# artifact and wires the device generically. Any content product (e.g. a future
+# "Toma") publishes its own product.yaml the same way; no OS code changes.
+id: halo
+name: Halo
+# The loopback URL the OS sets as the content surface's default and probes for
+# readiness. Served by halo.service (below) — never exposed on the network.
+url: "http://127.0.0.1:8090/"
+# Units (shipped in this artifact) the OS installs and enables. halo-update.service
+# is installed too but pulled by its timer, so it is not listed here.
+enable:
+  - halo.service
+  - halo-update.timer
