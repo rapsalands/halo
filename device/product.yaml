@@ -5,6 +5,10 @@
 # "Toma") publishes its own product.yaml the same way; no OS code changes.
 id: halo
 name: Halo
+# Human-facing blurb the OS shows next to the built-in URL (KioskOS reads it from
+# this manifest; the OS hardcodes no product copy). Optional in the manifest
+# contract, but without it the device shows no description.
+description: "Your built-in dashboard — clock, calendar, and at-a-glance info."
 # The loopback URL the OS sets as the content surface's default and probes for
 # readiness. Served by halo.service (below) — never exposed on the network.
 url: "http://127.0.0.1:8090/"
