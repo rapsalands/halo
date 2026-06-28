@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+// `/legacy` exposes the v1-compatible default-grid + WidthProvider API; the root export has a different shape in v2.
 import GridLayoutBase, { WidthProvider, type Layout } from 'react-grid-layout/legacy'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'

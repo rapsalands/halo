@@ -5,7 +5,7 @@ import { saveCache, loadCache } from '../lib/storage'
 const KEY = 'settings'
 
 /** Prefer saved positions, but guarantee every default tile has an entry. */
-function mergeLayout(saved: LayoutItem[] | undefined): LayoutItem[] {
+export function mergeLayout(saved: LayoutItem[] | undefined): LayoutItem[] {
   if (!saved?.length) return [...DEFAULT_LAYOUT]
   const byId = new Map(saved.map((it) => [it.i, it]))
   return DEFAULT_LAYOUT.map((def) => byId.get(def.i) ?? def)

@@ -1,5 +1,5 @@
 import { forwardRef, type CSSProperties, type ReactNode } from 'react'
-import type { RegionId } from '../store/defaults'
+import { TILE_LABELS, type RegionId } from '../store/defaults'
 
 interface TileShellProps {
   id: RegionId
@@ -32,7 +32,7 @@ export const TileShell = forwardRef<HTMLDivElement, TileShellProps>(function Til
         <button
           type="button"
           className="tile-shell__remove"
-          aria-label={`Remove ${id}`}
+          aria-label={`Remove ${TILE_LABELS[id]}`}
           // Stop the press from starting an RGL drag before the click lands.
           onMouseDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}

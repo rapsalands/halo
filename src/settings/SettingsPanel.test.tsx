@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { SettingsPanel } from './SettingsPanel'
 import { useSettings } from '../store/settings'
 import { useAppState } from '../store/appState'
-import { DEFAULT_LAYOUT } from '../store/defaults'
+import { DEFAULT_LAYOUT, DEFAULT_SETTINGS } from '../store/defaults'
 
 describe('SettingsPanel', () => {
   beforeEach(() => { localStorage.clear(); useSettings.getState().reset() })
@@ -68,5 +68,6 @@ describe('SettingsPanel — layout controls', () => {
     await openPanel()
     await userEvent.click(screen.getByRole('button', { name: /reset to default layout/i }))
     expect(useSettings.getState().settings.tileLayout).toEqual(DEFAULT_LAYOUT)
+    expect(useSettings.getState().settings.enabledTiles).toEqual(DEFAULT_SETTINGS.enabledTiles)
   })
 })

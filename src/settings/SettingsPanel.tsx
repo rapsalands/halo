@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { useSettings } from '../store/settings'
+import { useSettings, mergeLayout } from '../store/settings'
 import {
   ACCENT_SWATCHES, TICKER_CURRENCIES, TILE_LABELS, DEFAULT_LAYOUT, DEFAULT_SETTINGS,
   type TileId, type Units, type Performance, type Preview,
@@ -293,7 +293,7 @@ export function SettingsPanel() {
                 />
                 <button
                   className="set-btn primary block" style={{ marginTop: 8 }}
-                  onClick={() => { const c = decodeConfig(importText); if (c) { update(c); setImportText('') } }}
+                  onClick={() => { const c = decodeConfig(importText); if (c) { update(c.tileLayout ? { ...c, tileLayout: mergeLayout(c.tileLayout) } : c); setImportText('') } }}
                 >
                   Apply imported config
                 </button>
