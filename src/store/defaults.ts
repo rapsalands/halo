@@ -2,7 +2,36 @@ export type Units = 'metric' | 'imperial'
 export type BackgroundMode = 'weather' | 'photo'
 export type Performance = 'low' | 'high'
 export type LayoutPreset = 'photo-first' | 'bento'
-export type TileId = 'clock' | 'weather' | 'calendar' | 'sunmoon' | 'quote' | 'ticker' | 'air'
+export type RegionId =
+  | 'clock' | 'weather' | 'air' | 'calendar' | 'quote'
+  | 'sunmoon' | 'forecast' | 'photo' | 'ticker'
+
+/** All tiles are uniform now — every region is a toggleable tile. */
+export type TileId = RegionId
+
+export interface LayoutItem { i: RegionId; x: number; y: number; w: number; h: number }
+
+export const GRID_COLS = 12
+export const GRID_ROWS = 12
+
+/** Default bento mapped onto the 12-col × 12-row grid (matches the old PLACEMENT). */
+export const DEFAULT_LAYOUT: LayoutItem[] = [
+  { i: 'clock',    x: 0, y: 0,  w: 7,  h: 2 },
+  { i: 'weather',  x: 0, y: 2,  w: 4,  h: 2 },
+  { i: 'air',      x: 4, y: 2,  w: 3,  h: 2 },
+  { i: 'calendar', x: 0, y: 4,  w: 3,  h: 4 },
+  { i: 'quote',    x: 3, y: 4,  w: 4,  h: 2 },
+  { i: 'sunmoon',  x: 3, y: 6,  w: 4,  h: 2 },
+  { i: 'forecast', x: 0, y: 8,  w: 7,  h: 2 },
+  { i: 'photo',    x: 7, y: 0,  w: 5,  h: 10 },
+  { i: 'ticker',   x: 0, y: 10, w: 12, h: 2 },
+]
+
+export const TILE_LABELS: Record<RegionId, string> = {
+  clock: 'Clock', weather: 'Weather', air: 'Air quality', calendar: 'Calendar',
+  quote: 'Quote', sunmoon: 'Sun & Moon', forecast: 'Forecast', photo: 'Photo',
+  ticker: 'Ticker',
+}
 /** Preview scene override: 'live' uses real weather; others force a demo scene. */
 export type Preview =
   | 'live' | 'rain' | 'thunder' | 'snow' | 'clear' | 'night' | 'cloudy' | 'fog'
@@ -16,6 +45,8 @@ export interface Settings {
   hour12: boolean
   holidayCountry: string // ISO-3166 alpha-2, e.g. 'IN'
   enabledTiles: Record<TileId, boolean>
+  /** Per-screen tile positions/sizes (react-grid-layout items). */
+  tileLayout: LayoutItem[]
   location: { lat: number; lon: number; name: string } | null // null = auto-detect
   /** IANA timezone fallback for the clock when there is no weather feed (offline).
    *  The kiosk injects it via ?config=. Does NOT disable IP auto-detect. */
@@ -58,9 +89,10 @@ export const DEFAULT_SETTINGS: Settings = {
   hour12: false,
   holidayCountry: 'IN',
   enabledTiles: {
-    clock: true, weather: true, calendar: true,
-    sunmoon: true, quote: true, ticker: true, air: true,
+    clock: true, weather: true, air: true, calendar: true, quote: true,
+    sunmoon: true, forecast: true, photo: true, ticker: true,
   },
+  tileLayout: DEFAULT_LAYOUT,
   location: null,
   timezone: null,
   preview: 'live',
