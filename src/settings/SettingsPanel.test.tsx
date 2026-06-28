@@ -67,11 +67,27 @@ describe('SettingsPanel', () => {
     expect(screen.getByRole('button', { name: /live/i })).toBeInTheDocument()
   })
 
+  it('updates holiday country (Location tab)', async () => {
+    await openPanel()
+    await selectTab(/location/i)
+    const input = screen.getByLabelText(/holiday country/i)
+    await userEvent.clear(input)
+    await userEvent.type(input, 'us')
+    expect(useSettings.getState().settings.holidayCountry).toBe('US')
+  })
+
   it('arrow keys move between tabs', async () => {
     await openPanel()
     screen.getByRole('tab', { name: /display/i }).focus()
     await userEvent.keyboard('{ArrowRight}')
     expect(screen.getByRole('tab', { name: /clock/i })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('arrow keys move DOM focus to the selected tab', async () => {
+    await openPanel()
+    screen.getByRole('tab', { name: /display/i }).focus()
+    await userEvent.keyboard('{ArrowRight}')
+    expect(screen.getByRole('tab', { name: /clock/i })).toHaveFocus()
   })
 })
 

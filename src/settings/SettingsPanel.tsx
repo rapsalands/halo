@@ -338,6 +338,9 @@ export function SettingsPanel() {
     const i = TABS.findIndex((t) => t.id === tab)
     const next = TABS[(i + dir + TABS.length) % TABS.length]
     setTab(next.id)
+    // Keep DOM focus in step with the roving-tabindex selection so the
+    // keyboard user lands on the tab they just selected.
+    document.getElementById(`set-tab-${next.id}`)?.focus()
   }
 
   return (
