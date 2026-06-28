@@ -10,6 +10,6 @@ body {
   color: #fff;
   overflow: hidden;            /* kiosk: never scroll */
   -webkit-font-smoothing: antialiased;
-  cursor: none;                /* hide cursor on the wall panel */
+  cursor: default;             /* cursor visible (kiosk builds can re-hide it) */
 }
 #root { position: relative; }

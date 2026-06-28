@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 // `/legacy` exposes the v1-compatible default-grid + WidthProvider API; the root export has a different shape in v2.
 import GridLayoutBase, { WidthProvider, type Layout } from 'react-grid-layout/legacy'
 import 'react-grid-layout/css/styles.css'
@@ -41,12 +41,24 @@ const NEEDS_NET: Record<RegionId, boolean> = {
   sunmoon: true, forecast: true, photo: true, ticker: true,
 }
 
-const MARGIN = 14 // ~0.9rem gap
-const PADDING = 26 // ~1.6rem padding
+const MARGIN = 10 // gap between tiles
+const PADDING = 18 // outer grid padding
 
-function rowHeight(): number {
-  const h = typeof window !== 'undefined' ? window.innerHeight : 768
+function computeRowHeight(h: number): number {
   return Math.max(24, Math.floor((h - PADDING * 2 - MARGIN * (GRID_ROWS - 1)) / GRID_ROWS))
+}
+
+/** Row height that fills the viewport, recomputed on window resize so the grid
+ *  never latches a stale/early height (which left it half-filled). */
+function useRowHeight(): number {
+  const [vh, setVh] = useState(() => (typeof window !== 'undefined' ? window.innerHeight : 768))
+  useEffect(() => {
+    const onResize = () => setVh(window.innerHeight)
+    onResize() // correct any value read before the window settled
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return computeRowHeight(vh)
 }
 
 export function GridLayout() {
@@ -55,6 +67,7 @@ export function GridLayout() {
   const update = useSettings((s) => s.update)
   const editMode = useAppState((s) => s.editMode)
   const online = useOnline()
+  const rh = useRowHeight()
 
   const show = (id: RegionId) => !!enabled[id] && (online || !NEEDS_NET[id])
   const visibleIds = (Object.keys(RENDER) as RegionId[]).filter(show)
@@ -84,11 +97,12 @@ export function GridLayout() {
         layout={layout}
         cols={GRID_COLS}
         maxRows={GRID_ROWS}
-        rowHeight={rowHeight()}
+        rowHeight={rh}
         margin={[MARGIN, MARGIN]}
         containerPadding={[PADDING, PADDING]}
         compactType={null}
-        preventCollision
+        preventCollision={false}
+        isBounded
         isDraggable={editMode}
         isResizable={editMode}
         onLayoutChange={onLayoutChange}

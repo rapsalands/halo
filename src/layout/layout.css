@@ -13,43 +13,86 @@
   display: grid;
   min-width: 0;
   min-height: 0;
+  border-radius: 16px;
+  /* Clip any slightly-oversized content to the card instead of letting it
+     spill into neighbours (until per-tile content scaling lands). */
+  overflow: hidden;
 }
 
 /* Edit affordances */
 .tile-shell--editing {
-  outline: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent);
-  outline-offset: -2px;
-  border-radius: 16px;
+  outline: 2px dashed color-mix(in srgb, var(--accent) 75%, transparent);
+  outline-offset: -3px;
   cursor: grab;
+  /* A gentle sway (not a frantic shake) signals edit mode. Uses the independent
+     `rotate` property (NOT `transform`) so it composes with react-grid-layout's
+     `transform: translate(...)` positioning instead of overwriting it. */
+  animation: tile-jiggle 0.5s ease-in-out infinite;
 }
 .tile-shell--editing:active { cursor: grabbing; }
+/* The card being dragged shouldn't wobble. */
+.tile-shell.react-draggable-dragging { animation: none; rotate: 0deg; z-index: 10; }
+
+/* Stagger so the cards don't sway in lockstep (more lifelike). */
+.tile-shell--editing:nth-child(2n)   { animation-delay: -0.25s; }
+.tile-shell--editing:nth-child(3n)   { animation-delay: -0.5s; }
+.tile-shell--editing:nth-child(4n+1) { animation-delay: -0.75s; }
+
+@keyframes tile-jiggle {
+  0%   { rotate: -0.09deg; }
+  50%  { rotate: 0.09deg; }
+  100% { rotate: -0.09deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-shell--editing { animation: none; }
+}
 
 .tile-shell__remove {
   position: absolute;
-  top: 6px; right: 6px;
-  z-index: 5;
-  width: 26px; height: 26px;
+  top: 8px; right: 8px;
+  z-index: 6;
+  width: 34px; height: 34px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(10, 14, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(10, 14, 26, 0.78);
   color: #fff;
-  font-size: 1.05rem; line-height: 1;
+  font-size: 1.5rem; line-height: 1;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
-.tile-shell__remove:hover { background: rgba(220, 60, 60, 0.85); }
+.tile-shell__remove:hover { background: rgba(225, 60, 60, 0.92); transform: scale(1.08); }
 
 /* RGL drag placeholder — match the glass accent instead of the default red */
 .react-grid-item.react-grid-placeholder {
   background: color-mix(in srgb, var(--accent) 28%, transparent);
-  border: 1px dashed var(--accent);
+  border: 2px dashed var(--accent);
   border-radius: 16px;
   opacity: 0.6;
 }
 
-/* RGL resize handle — only visible while editing */
+/* RGL resize handle — hidden in view mode; a clear accent grip while editing. */
 .tile-shell .react-resizable-handle { display: none; }
-.tile-shell--editing .react-resizable-handle { display: block; opacity: 0.8; }
+.tile-shell--editing .react-resizable-handle {
+  display: block;
+  width: 26px; height: 26px;
+  right: 3px; bottom: 3px;
+  padding: 0;
+  background: none; /* drop the faint default SVG */
+  cursor: se-resize;
+  z-index: 6;
+}
+/* A visible rounded grip with a corner notch. */
+.tile-shell--editing .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 4px; bottom: 4px;
+  width: 16px; height: 16px;
+  border-right: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent);
+  border-bottom-right-radius: 7px;
+  opacity: 0.95;
+}
 
 /* Edit-mode tray / bar */
 .tile-tray {
