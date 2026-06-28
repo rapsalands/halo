@@ -4,10 +4,12 @@ import { formatClock, formatLongDate, timeOfDay, greeting } from './time'
 describe('formatClock', () => {
   const d = new Date('2026-06-06T14:05:09')
   it('formats 24-hour', () => expect(formatClock(d, false)).toBe('14:05'))
-  it('formats 12-hour', () => expect(formatClock(d, true)).toBe('2:05'))
+  it('formats 12-hour with meridiem', () => expect(formatClock(d, true)).toBe('2:05 PM'))
+  it('shows AM before noon', () => expect(formatClock(new Date('2026-06-06T09:05:00'), true)).toBe('9:05 AM'))
+  it('shows 12 AM at midnight', () => expect(formatClock(new Date('2026-06-06T00:30:00'), true)).toBe('12:30 AM'))
   it('appends seconds when requested', () => {
     expect(formatClock(d, false, undefined, true)).toBe('14:05:09')
-    expect(formatClock(d, true, undefined, true)).toBe('2:05:09')
+    expect(formatClock(d, true, undefined, true)).toBe('2:05:09 PM')
   })
 })
 

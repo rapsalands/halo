@@ -45,9 +45,10 @@ export function formatClock(date: Date, hour12: boolean, timeZone?: string, seco
   const m = minute.toString().padStart(2, '0')
   const s = seconds ? `:${second.toString().padStart(2, '0')}` : ''
   if (hour12) {
+    const suffix = hour < 12 ? 'AM' : 'PM'
     h = h % 12
     if (h === 0) h = 12
-    return `${h}:${m}${s}`
+    return `${h}:${m}${s} ${suffix}`
   }
   return `${h.toString().padStart(2, '0')}:${m}${s}`
 }

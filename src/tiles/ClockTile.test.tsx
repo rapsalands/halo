@@ -19,7 +19,7 @@ describe('ClockTile', () => {
   it('respects the 12-hour setting', () => {
     useSettings.getState().update({ hour12: true })
     render(<ClockTile />)
-    expect(screen.getByText('2:05')).toBeInTheDocument()
+    expect(screen.getByText('2:05 PM')).toBeInTheDocument()
   })
 
   it('renders the clock in the location timezone and shows the place name', () => {
