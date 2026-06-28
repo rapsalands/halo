@@ -48,20 +48,33 @@ export function CalendarTile() {
                 position: 'relative',
                 minHeight: 0,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                opacity: c.inMonth ? 1 : 0.28,
-                borderRadius: '0.5rem',
-                background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,120,120,0.18)' : 'transparent',
-                color: isToday ? '#0b0f1a' : 'inherit',
+                gap: '0.12rem',
+                opacity: c.inMonth ? 1 : 0.4,
               }}
             >
-              <span style={{ fontSize: '0.95rem', fontWeight: isToday ? 800 : 500 }}>{c.day}</span>
+              {/* Compact chip around the number so the highlight hugs content
+                  instead of flooding the whole (tall) cell. */}
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  minWidth: '1.85rem', height: '1.85rem', padding: '0 0.3rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.95rem', fontWeight: isToday ? 800 : 500,
+                  background: isToday ? 'var(--accent)' : isHoliday ? 'rgba(255,168,120,0.16)' : 'transparent',
+                  boxShadow: isHoliday && !isToday ? 'inset 0 0 0 1px rgba(255,168,120,0.42)' : 'none',
+                  color: isToday ? '#0b0f1a' : 'inherit',
+                }}
+              >
+                {c.day}
+              </span>
               {isHoliday && (
                 <>
                   <span
                     style={{
-                      marginTop: 2, fontSize: '0.52rem', lineHeight: 1.1, maxWidth: '96%',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      color: isToday ? '#0b0f1a' : '#ffb0b0', fontWeight: 600,
+                      maxWidth: '100%', fontSize: '0.5rem', lineHeight: 1.15, fontWeight: 600,
+                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden', textAlign: 'center',
+                      color: 'var(--text-dim)',
                     }}
                   >
                     {holidayName}
