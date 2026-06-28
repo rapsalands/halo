@@ -16,17 +16,17 @@ export const GRID_ROWS = 18
 
 /** Bump whenever GRID_ROWS or DEFAULT_LAYOUT changes shape, so persisted layouts
  *  from an older grid are discarded instead of rendering mis-sized. */
-export const LAYOUT_VERSION = 2
+export const LAYOUT_VERSION = 3
 
 /** Default bento mapped onto the 12-col × 12-row grid (matches the old PLACEMENT). */
 // Mapped onto a 12-col × 18-row grid. Heights match each tile's content so the
 // default view fills the screen without overflow; the ticker is a single thin row.
 export const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'clock',    x: 0, y: 0,  w: 7,  h: 3 },
-  { i: 'weather',  x: 0, y: 3,  w: 4,  h: 5 },
-  { i: 'air',      x: 4, y: 3,  w: 3,  h: 5 },
-  { i: 'calendar', x: 0, y: 8,  w: 3,  h: 6 },
-  { i: 'quote',    x: 3, y: 8,  w: 4,  h: 3 },
+  { i: 'clock',    x: 0, y: 0,  w: 7,  h: 2 },
+  { i: 'weather',  x: 0, y: 2,  w: 4,  h: 5 },
+  { i: 'air',      x: 4, y: 2,  w: 3,  h: 5 },
+  { i: 'calendar', x: 0, y: 7,  w: 3,  h: 7 },
+  { i: 'quote',    x: 3, y: 7,  w: 4,  h: 4 },
   { i: 'sunmoon',  x: 3, y: 11, w: 4,  h: 3 },
   { i: 'forecast', x: 0, y: 14, w: 7,  h: 3 },
   { i: 'photo',    x: 7, y: 0,  w: 5,  h: 17 },
