@@ -1,0 +1,81 @@
+/* ------------------------------------------------------------------ *
+ *  Rearrangeable tile grid — shell chrome, edit affordances, tray.
+ *  Pairs with react-grid-layout/css/styles.css (imported in GridLayout).
+ * ------------------------------------------------------------------ */
+
+.tile-grid { position: absolute; inset: 0; z-index: 1; }
+
+/* Each tile is its own size container, so content can later scale to the card
+   (cqi/cqh) instead of the viewport. Non-breaking until tiles adopt cq units. */
+.tile-shell {
+  position: relative;
+  container-type: size;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Edit affordances */
+.tile-shell--editing {
+  outline: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: -2px;
+  border-radius: 16px;
+  cursor: grab;
+}
+.tile-shell--editing:active { cursor: grabbing; }
+
+.tile-shell__remove {
+  position: absolute;
+  top: 6px; right: 6px;
+  z-index: 5;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(10, 14, 26, 0.7);
+  color: #fff;
+  font-size: 1.05rem; line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.tile-shell__remove:hover { background: rgba(220, 60, 60, 0.85); }
+
+/* RGL drag placeholder — match the glass accent instead of the default red */
+.react-grid-item.react-grid-placeholder {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border: 1px dashed var(--accent);
+  border-radius: 16px;
+  opacity: 0.6;
+}
+
+/* RGL resize handle — only visible while editing */
+.tile-shell .react-resizable-handle { display: none; }
+.tile-shell--editing .react-resizable-handle { display: block; opacity: 0.8; }
+
+/* Edit-mode tray / bar */
+.tile-tray {
+  position: absolute;
+  left: 50%; bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  max-width: 92vw;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 18, 30, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.tile-tray__label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); }
+.tile-tray__done,
+.tile-tray__add {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.8rem; font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.tile-tray__done { background: var(--accent); border-color: transparent; color: #0b0f1a; }
+.tile-tray__add:hover { background: rgba(255, 255, 255, 0.16); }
