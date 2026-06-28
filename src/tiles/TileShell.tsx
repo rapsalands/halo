@@ -33,10 +33,12 @@ export const TileShell = forwardRef<HTMLDivElement, TileShellProps>(function Til
           type="button"
           className="tile-shell__remove"
           aria-label={`Remove ${TILE_LABELS[id]}`}
-          // Stop the press from starting an RGL drag before the click lands.
-          onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onClick={() => onRemove(id)}
+          // Remove on pointer-DOWN (not click): the card wobbles in edit mode, so
+          // waiting for a click lets the button drift out from under the cursor/
+          // finger between press and release, sending the click to the card. Acting
+          // on press is drift-proof and works for mouse and touch alike.
+          // stopPropagation keeps the press from starting an RGL drag.
+          onPointerDown={(e) => { e.stopPropagation(); onRemove(id) }}
         >
           ×
         </button>
