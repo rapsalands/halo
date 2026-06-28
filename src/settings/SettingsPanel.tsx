@@ -104,6 +104,25 @@ export function SettingsPanel() {
               <button className="set-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
             </div>
 
+            <Section title="Layout">
+              <div className="set-col">
+                <button
+                  className="set-btn block"
+                  onClick={() => { setEditMode(true); setOpen(false) }}
+                >
+                  Edit layout
+                </button>
+              </div>
+              <div className="set-col">
+                <button
+                  className="set-btn block"
+                  onClick={() => update({ tileLayout: DEFAULT_LAYOUT, enabledTiles: DEFAULT_SETTINGS.enabledTiles })}
+                >
+                  Reset to default layout
+                </button>
+              </div>
+            </Section>
+
             <Section title="Appearance">
               <div className="set-col">
                 <span className="set-label">Performance</span>
@@ -246,25 +265,6 @@ export function SettingsPanel() {
                   id="country" className="set-input" value={settings.holidayCountry} maxLength={2}
                   onChange={(e) => update({ holidayCountry: e.target.value.toUpperCase() })}
                 />
-              </div>
-            </Section>
-
-            <Section title="Layout">
-              <div className="set-col">
-                <button
-                  className="set-btn block"
-                  onClick={() => { setEditMode(true); setOpen(false) }}
-                >
-                  Edit layout
-                </button>
-              </div>
-              <div className="set-col">
-                <button
-                  className="set-btn block"
-                  onClick={() => update({ tileLayout: DEFAULT_LAYOUT, enabledTiles: DEFAULT_SETTINGS.enabledTiles })}
-                >
-                  Reset to default layout
-                </button>
               </div>
             </Section>
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useSettings } from './settings'
-import { DEFAULT_SETTINGS, DEFAULT_LAYOUT } from './defaults'
+import { DEFAULT_SETTINGS, DEFAULT_LAYOUT, LAYOUT_VERSION } from './defaults'
 
 describe('settings store', () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe('settings store', () => {
 
   it('keeps saved tile positions but backfills any missing tile from defaults', () => {
     localStorage.setItem('halo:settings', JSON.stringify({
-      value: { tileLayout: [{ i: 'clock', x: 5, y: 5, w: 2, h: 2 }] },
+      value: { layoutVersion: LAYOUT_VERSION, tileLayout: [{ i: 'clock', x: 5, y: 5, w: 2, h: 2 }] },
       ts: 1,
     }))
     useSettings.getState().load()
@@ -38,6 +38,18 @@ describe('settings store', () => {
     // every default tile still has an entry (e.g. photo, which was not saved)
     expect(layout.find((l) => l.i === 'photo')).toBeTruthy()
     expect(layout).toHaveLength(DEFAULT_LAYOUT.length)
+  })
+
+  it('discards a layout saved under an older layoutVersion and adopts the default', () => {
+    // No layoutVersion (legacy save) → positions must NOT be kept.
+    localStorage.setItem('halo:settings', JSON.stringify({
+      value: { tileLayout: [{ i: 'clock', x: 9, y: 9, w: 1, h: 1 }] },
+      ts: 1,
+    }))
+    useSettings.getState().load()
+    const s = useSettings.getState().settings
+    expect(s.tileLayout).toEqual(DEFAULT_LAYOUT)
+    expect(s.layoutVersion).toBe(LAYOUT_VERSION)
   })
 
   it('falls back to a copy of the default layout when no tileLayout is saved', () => {

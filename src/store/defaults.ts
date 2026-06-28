@@ -14,6 +14,10 @@ export interface LayoutItem { i: RegionId; x: number; y: number; w: number; h: n
 export const GRID_COLS = 12
 export const GRID_ROWS = 18
 
+/** Bump whenever GRID_ROWS or DEFAULT_LAYOUT changes shape, so persisted layouts
+ *  from an older grid are discarded instead of rendering mis-sized. */
+export const LAYOUT_VERSION = 2
+
 /** Default bento mapped onto the 12-col × 12-row grid (matches the old PLACEMENT). */
 // Mapped onto a 12-col × 18-row grid. Heights match each tile's content so the
 // default view fills the screen without overflow; the ticker is a single thin row.
@@ -49,6 +53,8 @@ export interface Settings {
   enabledTiles: Record<TileId, boolean>
   /** Per-screen tile positions/sizes (react-grid-layout items). */
   tileLayout: LayoutItem[]
+  /** Schema version of tileLayout; mismatched persisted layouts are reset. */
+  layoutVersion: number
   location: { lat: number; lon: number; name: string } | null // null = auto-detect
   /** IANA timezone fallback for the clock when there is no weather feed (offline).
    *  The kiosk injects it via ?config=. Does NOT disable IP auto-detect. */
@@ -95,6 +101,7 @@ export const DEFAULT_SETTINGS: Settings = {
     sunmoon: true, forecast: true, photo: true, ticker: true,
   },
   tileLayout: DEFAULT_LAYOUT,
+  layoutVersion: LAYOUT_VERSION,
   location: null,
   timezone: null,
   preview: 'live',

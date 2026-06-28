@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { DEFAULT_SETTINGS, DEFAULT_LAYOUT, type Settings, type LayoutItem } from './defaults'
+import { DEFAULT_SETTINGS, DEFAULT_LAYOUT, LAYOUT_VERSION, type Settings, type LayoutItem } from './defaults'
 import { saveCache, loadCache } from '../lib/storage'
 
 const KEY = 'settings'
@@ -23,6 +23,9 @@ export const useSettings = create<SettingsState>((set, get) => ({
   load: () => {
     const cached = loadCache<Partial<Settings>>(KEY)
     if (cached) {
+      // A layout saved under an older grid (different GRID_ROWS/DEFAULT_LAYOUT)
+      // would render mis-sized, so discard it and adopt the current default.
+      const layoutCompatible = cached.value.layoutVersion === LAYOUT_VERSION
       set({
         settings: {
           ...DEFAULT_SETTINGS,
@@ -30,7 +33,8 @@ export const useSettings = create<SettingsState>((set, get) => ({
           // Deep-merge tiles so newly-added tiles inherit their default rather
           // than being absent (and therefore hidden) for existing screens.
           enabledTiles: { ...DEFAULT_SETTINGS.enabledTiles, ...cached.value.enabledTiles },
-          tileLayout: mergeLayout(cached.value.tileLayout),
+          tileLayout: layoutCompatible ? mergeLayout(cached.value.tileLayout) : [...DEFAULT_LAYOUT],
+          layoutVersion: LAYOUT_VERSION,
         },
       })
     }
