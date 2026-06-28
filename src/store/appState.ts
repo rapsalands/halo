@@ -39,16 +39,20 @@ interface AppState {
   now: Date
   weather: Weather | null
   location: GeoLocation | null
+  editMode: boolean
   setNow: (d: Date) => void
   setWeather: (w: Weather) => void
   setLocation: (l: GeoLocation) => void
+  setEditMode: (v: boolean) => void
 }
 
 export const useAppState = create<AppState>((set) => ({
   now: new Date(),
   weather: null,
   location: null,
+  editMode: false,
   setNow: (now) => set({ now }),
   setWeather: (weather) => set({ weather }),
   setLocation: (location) => set({ location }),
+  setEditMode: (editMode) => set({ editMode }),
 }))

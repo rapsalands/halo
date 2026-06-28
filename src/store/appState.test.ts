@@ -14,4 +14,12 @@ describe('appState store', () => {
     useAppState.getState().setLocation({ lat: 1, lon: 2, name: 'Test' })
     expect(useAppState.getState().location?.name).toBe('Test')
   })
+
+  it('defaults editMode off and toggles it', () => {
+    expect(useAppState.getState().editMode).toBe(false)
+    useAppState.getState().setEditMode(true)
+    expect(useAppState.getState().editMode).toBe(true)
+    useAppState.getState().setEditMode(false)
+    expect(useAppState.getState().editMode).toBe(false)
+  })
 })
