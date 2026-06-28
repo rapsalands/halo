@@ -30,6 +30,10 @@
   animation: tile-jiggle 0.5s ease-in-out infinite;
 }
 .tile-shell--editing:active { cursor: grabbing; }
+/* Settle the card while the pointer is over it, so the × / resize grip are a
+   stationary target (a wobbling button drifts out from under the cursor between
+   mousedown and mouseup, sending the click to the card instead of the button). */
+.tile-shell--editing:hover { animation-play-state: paused; rotate: 0deg; }
 /* The card being dragged shouldn't wobble. */
 .tile-shell.react-draggable-dragging { animation: none; rotate: 0deg; z-index: 10; }
 
@@ -120,5 +124,10 @@
   border-radius: 9px;
   cursor: pointer;
 }
-.tile-tray__done { background: var(--accent); border-color: transparent; color: #0b0f1a; }
+.tile-tray__done {
+  background: var(--accent); border-color: transparent; color: #0b0f1a;
+  font-size: 0.95rem; font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 11px;
+}
 .tile-tray__add:hover { background: rgba(255, 255, 255, 0.16); }
