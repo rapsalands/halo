@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSettings } from '../store/settings'
+import { useAppState } from '../store/appState'
 
 /** Rolling hints shown to a first-time kiosk user. Add freely — the banner
  * cross-fades through them. Copy is customer-facing (KioskMate). */
@@ -16,6 +17,7 @@ const ROTATE_MS = 7000
 export function OnboardingBanner() {
   const show = useSettings((s) => s.settings.showOnboardingBanner)
   const update = useSettings((s) => s.update)
+  const editMode = useAppState((s) => s.editMode)
   const [i, setI] = useState(0)
 
   useEffect(() => {
@@ -24,7 +26,9 @@ export function OnboardingBanner() {
     return () => clearInterval(t)
   }, [show])
 
-  if (!show) return null
+  // Hidden while editing the layout: it overlaps the bottom row and would block
+  // the ticker's resize handle.
+  if (!show || editMode) return null
 
   return (
     <div
