@@ -1,19 +1,14 @@
 import { useState, type ReactNode } from 'react'
 import { useSettings } from '../store/settings'
 import {
-  ACCENT_SWATCHES, TICKER_CURRENCIES,
+  ACCENT_SWATCHES, TICKER_CURRENCIES, TILE_LABELS, DEFAULT_LAYOUT, DEFAULT_SETTINGS,
   type TileId, type Units, type Performance, type Preview,
 } from '../store/defaults'
+import { useAppState } from '../store/appState'
 import { DEMO_NAMES } from '../lib/demo'
 import { geocodeCity } from '../data/geo'
 import { encodeConfig, decodeConfig } from './configIO'
 import './settings.css'
-
-const TILE_LABELS: Record<TileId, string> = {
-  clock: 'Clock', weather: 'Weather', calendar: 'Calendar',
-  sunmoon: 'Sun & Moon', quote: 'Quote', ticker: 'Ticker', air: 'Air quality',
-  photo: 'Photo', forecast: 'Forecast',
-}
 
 const CURRENCY_OPTS = Object.keys(TICKER_CURRENCIES).map((c) => ({ value: c, label: c.toUpperCase() }))
 const HOURS = Array.from({ length: 24 }, (_, h) => h)
@@ -80,6 +75,7 @@ export function SettingsPanel() {
   const [importText, setImportText] = useState('')
   const settings = useSettings((s) => s.settings)
   const update = useSettings((s) => s.update)
+  const setEditMode = useAppState((s) => s.setEditMode)
   const [coinsText, setCoinsText] = useState(settings.tickerCoins.join(', '))
 
   async function searchCity() {
@@ -250,6 +246,25 @@ export function SettingsPanel() {
                   id="country" className="set-input" value={settings.holidayCountry} maxLength={2}
                   onChange={(e) => update({ holidayCountry: e.target.value.toUpperCase() })}
                 />
+              </div>
+            </Section>
+
+            <Section title="Layout">
+              <div className="set-col">
+                <button
+                  className="set-btn block"
+                  onClick={() => { setEditMode(true); setOpen(false) }}
+                >
+                  Edit layout
+                </button>
+              </div>
+              <div className="set-col">
+                <button
+                  className="set-btn block"
+                  onClick={() => update({ tileLayout: DEFAULT_LAYOUT, enabledTiles: DEFAULT_SETTINGS.enabledTiles })}
+                >
+                  Reset to default layout
+                </button>
               </div>
             </Section>
 
