@@ -135,9 +135,5 @@ A single component that owns **all** common card chrome, so behavior changes hap
 
 ## Out of scope
 
-- Settings panel redesign (tabbed/wider modal) — separate spec.
-- New offline tiles (moon phase, world clocks, countdown, timer, etc.) — separate spec.
 - Per-tile responsive-content conversion to container units — separate, per-tile effort (foundation laid here).
 - Per-breakpoint layouts — single scaling layout only.
-- Offline gating behavior itself (the `NEEDS_NET` policy) — inherited from `main` unchanged.
-- Onboarding banner — unrelated overlay, untouched.
