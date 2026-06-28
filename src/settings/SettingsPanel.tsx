@@ -12,6 +12,7 @@ import './settings.css'
 const TILE_LABELS: Record<TileId, string> = {
   clock: 'Clock', weather: 'Weather', calendar: 'Calendar',
   sunmoon: 'Sun & Moon', quote: 'Quote', ticker: 'Ticker', air: 'Air quality',
+  photo: 'Photo', forecast: 'Forecast',
 }
 
 const CURRENCY_OPTS = Object.keys(TICKER_CURRENCIES).map((c) => ({ value: c, label: c.toUpperCase() }))

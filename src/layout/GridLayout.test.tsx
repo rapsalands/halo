@@ -7,7 +7,6 @@ import { useAppState } from '../store/appState'
 function region(c: HTMLElement, id: string): HTMLElement | null {
   return c.querySelector(`[data-region="${id}"]`)
 }
-
 function setOnline(value: boolean) {
   vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(value)
 }
@@ -15,37 +14,51 @@ function setOnline(value: boolean) {
 describe('GridLayout', () => {
   beforeEach(() => {
     useSettings.getState().reset()
-    useAppState.setState({ weather: null, now: new Date('2026-06-06T12:00:00') })
+    useAppState.setState({ weather: null, now: new Date('2026-06-06T12:00:00'), editMode: false })
+    setOnline(true)
   })
+  afterEach(() => vi.restoreAllMocks())
 
-  it('places the clock and photo panel so their column edges meet at line 8', () => {
+  it('renders every enabled tile', () => {
     const { container } = render(<GridLayout />)
-    expect(region(container, 'clock')!.getAttribute('data-col')).toBe('1 / 8')
-    expect(region(container, 'photo')!.getAttribute('data-col')).toBe('8 / 13')
-  })
-
-  it('aligns the left-column regions to the same right edge (line 8)', () => {
-    const { container } = render(<GridLayout />)
-    for (const id of ['clock', 'air', 'sunmoon', 'forecast']) {
-      expect(region(container, id)!.getAttribute('data-col')!.endsWith('/ 8')).toBe(true)
+    for (const id of ['clock', 'weather', 'air', 'calendar', 'quote', 'sunmoon', 'forecast', 'photo', 'ticker']) {
+      expect(region(container, id)).toBeInTheDocument()
     }
   })
 
-  it('always renders the photo panel and omits disabled tiles', () => {
+  it('omits a disabled tile', () => {
     useSettings.getState().update({
-      enabledTiles: { clock: true, weather: false, calendar: true, sunmoon: true, quote: true, ticker: true, air: true },
+      enabledTiles: { ...useSettings.getState().settings.enabledTiles, weather: false },
     })
     const { container } = render(<GridLayout />)
-    expect(region(container, 'photo')).toBeInTheDocument()
     expect(region(container, 'weather')).toBeNull()
-    expect(region(container, 'forecast')).toBeNull() // forecast follows the weather toggle
+  })
+
+  it('shows forecast independently of the weather tile', () => {
+    useSettings.getState().update({
+      enabledTiles: { ...useSettings.getState().settings.enabledTiles, weather: false, forecast: true },
+    })
+    const { container } = render(<GridLayout />)
+    expect(region(container, 'weather')).toBeNull()
+    expect(region(container, 'forecast')).toBeInTheDocument()
+  })
+
+  it('shows remove buttons and the tray only in edit mode', () => {
+    const { container, rerender } = render(<GridLayout />)
+    expect(container.querySelectorAll('.tile-shell__remove')).toHaveLength(0)
+    expect(container.querySelector('[data-testid="tile-tray"]')).toBeNull()
+
+    useAppState.setState({ editMode: true })
+    rerender(<GridLayout />)
+    expect(container.querySelectorAll('.tile-shell__remove').length).toBeGreaterThan(0)
+    expect(container.querySelector('[data-testid="tile-tray"]')).toBeInTheDocument()
   })
 })
 
 describe('GridLayout offline gating', () => {
   beforeEach(() => {
     useSettings.getState().reset()
-    useAppState.setState({ weather: null, now: new Date('2026-06-06T12:00:00') })
+    useAppState.setState({ weather: null, now: new Date('2026-06-06T12:00:00'), editMode: false })
   })
   afterEach(() => vi.restoreAllMocks())
 
@@ -53,7 +66,7 @@ describe('GridLayout offline gating', () => {
     setOnline(false)
     const { container } = render(<GridLayout />)
     for (const id of ['weather', 'air', 'forecast', 'photo', 'ticker', 'sunmoon']) {
-      expect(region(container, id)).toBeNull() // no spinners/errors offline
+      expect(region(container, id)).toBeNull()
     }
     for (const id of ['clock', 'calendar', 'quote']) {
       expect(region(container, id)).toBeInTheDocument()
