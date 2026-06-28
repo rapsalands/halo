@@ -25,4 +25,18 @@ describe('settings store', () => {
     expect(useSettings.getState().settings.hour12).toBe(true)
     expect(useSettings.getState().settings.units).toBe(DEFAULT_SETTINGS.units)
   })
+
+  it('keeps saved tile positions but backfills any missing tile from defaults', () => {
+    localStorage.setItem('halo:settings', JSON.stringify({
+      value: { tileLayout: [{ i: 'clock', x: 5, y: 5, w: 2, h: 2 }] },
+      ts: 1,
+    }))
+    useSettings.getState().load()
+    const layout = useSettings.getState().settings.tileLayout
+    // saved clock position is preserved
+    expect(layout.find((l) => l.i === 'clock')).toEqual({ i: 'clock', x: 5, y: 5, w: 2, h: 2 })
+    // every default tile still has an entry (e.g. photo, which was not saved)
+    expect(layout.find((l) => l.i === 'photo')).toBeTruthy()
+    expect(layout).toHaveLength(9)
+  })
 })

@@ -1,8 +1,15 @@
 import { create } from 'zustand'
-import { DEFAULT_SETTINGS, type Settings } from './defaults'
+import { DEFAULT_SETTINGS, DEFAULT_LAYOUT, type Settings, type LayoutItem } from './defaults'
 import { saveCache, loadCache } from '../lib/storage'
 
 const KEY = 'settings'
+
+/** Prefer saved positions, but guarantee every default tile has an entry. */
+function mergeLayout(saved: LayoutItem[] | undefined): LayoutItem[] {
+  if (!saved?.length) return DEFAULT_LAYOUT
+  const byId = new Map(saved.map((it) => [it.i, it]))
+  return DEFAULT_LAYOUT.map((def) => byId.get(def.i) ?? def)
+}
 
 interface SettingsState {
   settings: Settings
@@ -23,6 +30,7 @@ export const useSettings = create<SettingsState>((set, get) => ({
           // Deep-merge tiles so newly-added tiles inherit their default rather
           // than being absent (and therefore hidden) for existing screens.
           enabledTiles: { ...DEFAULT_SETTINGS.enabledTiles, ...cached.value.enabledTiles },
+          tileLayout: mergeLayout(cached.value.tileLayout),
         },
       })
     }
