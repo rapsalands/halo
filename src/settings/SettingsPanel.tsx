@@ -219,8 +219,6 @@ function TilesTab({ onClose }: { onClose: () => void }) {
             />
           </div>
         ))}
-      </Section>
-      <Section title="Information">
         <div className="set-row">
           <Toggle label="Information Banner" checked={settings.showOnboardingBanner} onChange={(showOnboardingBanner) => update({ showOnboardingBanner })} />
         </div>
