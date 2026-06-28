@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useSettings } from './settings'
-import { DEFAULT_SETTINGS } from './defaults'
+import { DEFAULT_SETTINGS, DEFAULT_LAYOUT } from './defaults'
 
 describe('settings store', () => {
   beforeEach(() => {
@@ -37,6 +37,15 @@ describe('settings store', () => {
     expect(layout.find((l) => l.i === 'clock')).toEqual({ i: 'clock', x: 5, y: 5, w: 2, h: 2 })
     // every default tile still has an entry (e.g. photo, which was not saved)
     expect(layout.find((l) => l.i === 'photo')).toBeTruthy()
-    expect(layout).toHaveLength(9)
+    expect(layout).toHaveLength(DEFAULT_LAYOUT.length)
+  })
+
+  it('falls back to a copy of the default layout when no tileLayout is saved', () => {
+    localStorage.setItem('halo:settings', JSON.stringify({ value: { hour12: true }, ts: 1 }))
+    useSettings.getState().load()
+    const layout = useSettings.getState().settings.tileLayout
+    expect(layout).toEqual(DEFAULT_LAYOUT)
+    // must be a distinct array reference so mutations cannot leak into the shared constant
+    expect(layout).not.toBe(DEFAULT_LAYOUT)
   })
 })
