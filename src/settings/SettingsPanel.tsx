@@ -6,9 +6,10 @@ import {
 } from '../store/defaults'
 import { useAppState } from '../store/appState'
 import { DEMO_NAMES } from '../lib/demo'
-import { geocodeSearch, type GeoResult } from '../data/geo'
+import { geocodeSearch, ipLocate, type GeoResult } from '../data/geo'
 import { fetchCountries, type Country } from '../data/holidays'
 import { usePolledData } from '../hooks/usePolledData'
+import { fetchWithFallback } from '../lib/fetchWithFallback'
 import { encodeConfig, decodeConfig } from './configIO'
 import './settings.css'
 
@@ -173,10 +174,15 @@ function CityAutocomplete() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<GeoResult[]>([])
   const [open, setOpen] = useState(false)
+  const [detecting, setDetecting] = useState(false)
   const boxRef = useRef<HTMLDivElement>(null)
+  // When we fill the box programmatically (auto-detect), skip the next search
+  // so it doesn't pop a results dropdown for the value we just inserted.
+  const suppressSearch = useRef(false)
 
   // Debounce the network search so we don't fire a request on every keystroke.
   useEffect(() => {
+    if (suppressSearch.current) { suppressSearch.current = false; return }
     const q = query.trim()
     let cancelled = false
     const id = setTimeout(() => {
@@ -187,6 +193,19 @@ function CityAutocomplete() {
     }, 250)
     return () => { cancelled = true; clearTimeout(id) }
   }, [query])
+
+  // Detect via IP, pin the result, and show its name in the box for confirmation.
+  async function detect() {
+    setDetecting(true)
+    try {
+      const res = await fetchWithFallback('geo', ipLocate)
+      update({ location: res.data })
+      suppressSearch.current = true
+      setQuery(res.data.name)
+      setResults([]); setOpen(false)
+    } catch { /* no network and no cache — leave the box as-is */ }
+    finally { setDetecting(false) }
+  }
 
   // Dismiss the dropdown when a click lands outside the widget.
   useEffect(() => {
@@ -228,8 +247,8 @@ function CityAutocomplete() {
           </ul>
         )}
       </div>
-      <button className="set-btn block" style={{ marginTop: 8 }} onClick={() => update({ location: null })}>
-        Use auto-detected location
+      <button className="set-btn block" style={{ marginTop: 8 }} onClick={detect} disabled={detecting}>
+        {detecting ? 'Detecting…' : 'Detect my location'}
       </button>
     </div>
   )
