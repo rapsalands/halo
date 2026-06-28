@@ -32,7 +32,7 @@
   inset: 0;
   z-index: 30;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   background: rgba(4, 6, 12, 0.5);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
@@ -41,12 +41,12 @@
 @keyframes set-fade { from { opacity: 0; } to { opacity: 1; } }
 
 .set-panel {
-  width: 392px;
+  width: 640px;
   max-width: 92vw;
   height: 100%;
   overflow-y: auto;
   border-radius: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
   padding: 22px 24px 40px;
   background: rgba(14, 18, 30, 0.66);
   backdrop-filter: blur(26px) saturate(140%);
@@ -54,7 +54,7 @@
   animation: set-slide 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .perf-low .set-panel { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(14, 18, 30, 0.94); }
-@keyframes set-slide { from { transform: translateX(28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes set-slide { from { transform: translateX(-28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
 /* hide scrollbar but keep scrollability */
 .set-panel::-webkit-scrollbar { width: 0; }
@@ -224,3 +224,35 @@ textarea.set-input { resize: none; font-family: ui-monospace, SFMono-Regular, Me
 .scene-chip:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-1px); }
 .scene-chip.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, transparent); color: #fff; }
 .scene-chip .ico { font-size: 1.15rem; line-height: 1; }
+
+/* Category tabs ------------------------------------------------------- */
+.set-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 14px 0 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.set-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 10px 4px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.set-tab .ico { font-size: 1.2rem; line-height: 1; }
+.set-tab:hover { color: #fff; }
+.set-tab[aria-selected='true'] { color: #fff; border-bottom-color: var(--accent); }
+.set-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 6px; }
+
+.set-tabpanel { padding-top: 4px; }
+/* First section inside a pane shouldn't add a big top gap under the tabs. */
+.set-tabpanel > .set-section:first-child { margin-top: 14px; }
