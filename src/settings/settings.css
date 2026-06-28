@@ -170,6 +170,43 @@
 .set-input::placeholder { color: rgba(255, 255, 255, 0.4); }
 .set-input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.1); }
 textarea.set-input { resize: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.68rem; line-height: 1.4; }
+select.set-input { cursor: pointer; appearance: none; -webkit-appearance: none; padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 11px center; }
+/* Native option lists can't inherit the glass theme; keep them dark + legible. */
+select.set-input option { background: #141a26; color: #fff; }
+
+/* Location autocomplete ----------------------------------------------- */
+.set-ac { position: relative; }
+.set-ac-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 232px;
+  overflow-y: auto;
+  background: rgba(20, 26, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6);
+}
+.set-ac-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 0.86rem;
+  padding: 9px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.set-ac-item:hover, .set-ac-item:focus-visible { background: color-mix(in srgb, var(--accent) 24%, transparent); outline: none; }
 
 .set-btn {
   border: 1px solid rgba(255, 255, 255, 0.16);

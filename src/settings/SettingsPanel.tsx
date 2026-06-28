@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { useSettings, mergeLayout } from '../store/settings'
 import {
   ACCENT_SWATCHES, TICKER_CURRENCIES, TILE_LABELS, DEFAULT_LAYOUT, DEFAULT_SETTINGS,
@@ -6,13 +6,28 @@ import {
 } from '../store/defaults'
 import { useAppState } from '../store/appState'
 import { DEMO_NAMES } from '../lib/demo'
-import { geocodeCity } from '../data/geo'
+import { geocodeSearch, type GeoResult } from '../data/geo'
+import { fetchCountries, type Country } from '../data/holidays'
+import { usePolledData } from '../hooks/usePolledData'
 import { encodeConfig, decodeConfig } from './configIO'
 import './settings.css'
 
 const CURRENCY_OPTS = Object.keys(TICKER_CURRENCIES).map((c) => ({ value: c, label: c.toUpperCase() }))
 const HOURS = Array.from({ length: 24 }, (_, h) => h)
 function hourLabel(h: number): string { return `${h.toString().padStart(2, '0')}:00` }
+const DAY_MS = 24 * 60 * 60_000
+
+/** Shown before Nager's country list loads (and as an offline floor). */
+const FALLBACK_COUNTRIES: Country[] = [
+  { code: 'US', name: 'United States' }, { code: 'GB', name: 'United Kingdom' },
+  { code: 'IN', name: 'India' }, { code: 'CA', name: 'Canada' }, { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' }, { code: 'FR', name: 'France' }, { code: 'JP', name: 'Japan' },
+]
+
+/** A place suggestion as one human-readable line, e.g. "Paris, Île-de-France, France". */
+function placeLabel(r: GeoResult): string {
+  return [r.name, r.admin1, r.country].filter(Boolean).join(', ')
+}
 
 /** Preview selector chips → friendly label + glyph. */
 const SCENE_META: Record<Preview, { label: string; ico: string }> = {
@@ -151,41 +166,111 @@ function ClockTab() {
   )
 }
 
-function LocationTab() {
-  const settings = useSettings((s) => s.settings)
+/** Debounced place search with a tap-to-pick suggestion list. */
+function CityAutocomplete() {
+  const location = useSettings((s) => s.settings.location)
   const update = useSettings((s) => s.update)
-  const [city, setCity] = useState('')
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<GeoResult[]>([])
+  const [open, setOpen] = useState(false)
+  const boxRef = useRef<HTMLDivElement>(null)
 
-  async function searchCity() {
-    const loc = await geocodeCity(city)
-    if (loc) { update({ location: loc }); setCity('') }
+  // Debounce the network search so we don't fire a request on every keystroke.
+  useEffect(() => {
+    const q = query.trim()
+    let cancelled = false
+    const id = setTimeout(() => {
+      if (q.length < 2) { if (!cancelled) { setResults([]); setOpen(false) } return }
+      geocodeSearch(q)
+        .then((found) => { if (!cancelled) { setResults(found); setOpen(true) } })
+        .catch(() => { if (!cancelled) setResults([]) })
+    }, 250)
+    return () => { cancelled = true; clearTimeout(id) }
+  }, [query])
+
+  // Dismiss the dropdown when a click lands outside the widget.
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [])
+
+  function pick(r: GeoResult) {
+    update({ location: { lat: r.lat, lon: r.lon, name: r.name } })
+    setQuery(''); setResults([]); setOpen(false)
   }
 
   return (
-    <>
-      <div className="set-col">
-        <span className="set-label">Search city</span>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input
-            className="set-input"
-            placeholder={settings.location?.name ?? 'Auto-detected'}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') searchCity() }}
-          />
-          <button className="set-btn" onClick={searchCity}>Search</button>
-        </div>
-      </div>
-      <div className="set-col">
-        <button className="set-btn block" onClick={() => update({ location: null })}>Use auto-detected location</button>
-      </div>
-      <div className="set-col">
-        <label htmlFor="country" className="set-label">Holiday country (ISO-2)</label>
+    <div className="set-col">
+      <span className="set-label">Location</span>
+      <div className="set-ac" ref={boxRef}>
         <input
-          id="country" className="set-input" value={settings.holidayCountry} maxLength={2}
-          onChange={(e) => update({ holidayCountry: e.target.value.toUpperCase() })}
+          className="set-input"
+          placeholder={location?.name ?? 'Auto-detected — type a city'}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => { if (results.length) setOpen(true) }}
+          aria-label="Search location"
+          aria-expanded={open}
+          aria-controls="set-ac-list"
         />
+        {open && results.length > 0 && (
+          <ul className="set-ac-list" id="set-ac-list" role="listbox">
+            {results.map((r, i) => (
+              <li key={`${r.lat},${r.lon},${i}`}>
+                <button type="button" className="set-ac-item" onClick={() => pick(r)}>
+                  {placeLabel(r)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+      <button className="set-btn block" style={{ marginTop: 8 }} onClick={() => update({ location: null })}>
+        Use auto-detected location
+      </button>
+    </div>
+  )
+}
+
+/** Native dropdown of the countries Nager.Date supports (cached for offline). */
+function CountrySelect() {
+  const holidayCountry = useSettings((s) => s.settings.holidayCountry)
+  const update = useSettings((s) => s.update)
+  const { data } = usePolledData<Country[]>('countries', fetchCountries, DAY_MS)
+
+  // Merge the cached list with the offline fallback (and the current value if
+  // it isn't in either), deduped by code and sorted by name.
+  const byCode = new Map<string, Country>()
+  for (const c of [...FALLBACK_COUNTRIES, ...(data ?? [])]) byCode.set(c.code, c)
+  if (holidayCountry && !byCode.has(holidayCountry)) {
+    byCode.set(holidayCountry, { code: holidayCountry, name: holidayCountry })
+  }
+  const countries = [...byCode.values()].sort((a, b) => a.name.localeCompare(b.name))
+
+  return (
+    <div className="set-col">
+      <label htmlFor="country" className="set-label">Holiday country</label>
+      <select
+        id="country" className="set-input"
+        value={holidayCountry}
+        onChange={(e) => update({ holidayCountry: e.target.value })}
+      >
+        {countries.map((c) => (
+          <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function LocationTab() {
+  return (
+    <>
+      <CityAutocomplete />
+      <CountrySelect />
     </>
   )
 }

@@ -67,12 +67,11 @@ describe('SettingsPanel', () => {
     expect(screen.getByRole('button', { name: /live/i })).toBeInTheDocument()
   })
 
-  it('updates holiday country (Location tab)', async () => {
+  it('selects holiday country from the dropdown (Location tab)', async () => {
     await openPanel()
     await selectTab(/location/i)
-    const input = screen.getByLabelText(/holiday country/i)
-    await userEvent.clear(input)
-    await userEvent.type(input, 'us')
+    const select = screen.getByLabelText(/holiday country/i)
+    await userEvent.selectOptions(select, 'US')
     expect(useSettings.getState().settings.holidayCountry).toBe('US')
   })
 
