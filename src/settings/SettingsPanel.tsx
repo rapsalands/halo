@@ -223,7 +223,9 @@ function CityAutocomplete() {
   }, [])
 
   function pick(r: GeoResult) {
-    update({ location: { lat: r.lat, lon: r.lon, name: r.name } })
+    // Carry the place's timezone so the clock is right even offline (before any
+    // weather feed loads); null clears a stale fallback when unknown.
+    update({ location: { lat: r.lat, lon: r.lon, name: r.name }, timezone: r.timezone ?? null })
     setQuery(''); setResults([]); setOpen(false)
   }
 

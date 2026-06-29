@@ -10,10 +10,10 @@ import type { GeoResult } from './geo'
 
 export interface PlacesManifestEntry { code: string; label: string; file: string; count?: number }
 
-/** One CSV-distilled row: [zip, city, state, lat, lon, population]. */
-export type CompactRow = [string, string, string, number, number, number]
+/** One CSV-distilled row: [zip, city, state, lat, lon, population, timezone?]. */
+export type CompactRow = [string, string, string, number, number, number, string?]
 
-interface Row { zip: string; city: string; state: string; lat: number; lon: number; pop: number }
+interface Row { zip: string; city: string; state: string; lat: number; lon: number; pop: number; tz: string }
 
 const rowsByCode = new Map<string, Row[]>()
 /** Deduped best-population representative per city+state, sorted by pop desc. */
@@ -24,7 +24,7 @@ let loadStarted = false
 /** Feed one country's rows into the in-memory indexes (also used by tests). */
 export function ingestPlaces(code: string, label: string, raw: CompactRow[]): void {
   const cc = code.toUpperCase()
-  const rows: Row[] = raw.map(([zip, city, state, lat, lon, pop]) => ({ zip, city, state, lat, lon, pop }))
+  const rows: Row[] = raw.map(([zip, city, state, lat, lon, pop, tz]) => ({ zip, city, state, lat, lon, pop, tz: tz ?? '' }))
   rowsByCode.set(cc, rows)
   labelByCode.set(cc, label)
 
@@ -49,6 +49,7 @@ function toResult(r: Row, cc: string): GeoResult {
   return {
     lat: r.lat, lon: r.lon, name: r.city,
     admin1: r.state, country: labelByCode.get(cc) ?? cc, countryCode: cc,
+    timezone: r.tz || undefined,
   }
 }
 

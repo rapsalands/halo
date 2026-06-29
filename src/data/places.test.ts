@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { ingestPlaces, searchPlaces, placesReady, resetPlaces, type CompactRow } from './places'
 
 const US: CompactRow[] = [
-  ['10001', 'New York', 'NY', 40.7506, -73.9971, 21102],
+  ['10001', 'New York', 'NY', 40.7506, -73.9971, 21102, 'America/New_York'],
   ['62701', 'Springfield', 'IL', 39.7989, -89.6442, 114000],
   ['01103', 'Springfield', 'MA', 42.1015, -72.5898, 153000],
   ['97477', 'Springfield', 'OR', 44.0462, -123.0220, 47000],
@@ -17,9 +17,9 @@ describe('places search', () => {
     expect(placesReady()).toBe(true)
   })
 
-  it('matches cities by name prefix', () => {
+  it('matches cities by name prefix and carries the timezone', () => {
     const r = searchPlaces('new')
-    expect(r[0]).toMatchObject({ name: 'New York', admin1: 'NY', countryCode: 'US', country: 'United States' })
+    expect(r[0]).toMatchObject({ name: 'New York', admin1: 'NY', countryCode: 'US', country: 'United States', timezone: 'America/New_York' })
     expect(r[0].lat).toBeCloseTo(40.7506)
   })
 

@@ -18,4 +18,6 @@ export interface GeoResult {
   admin1?: string
   country?: string
   countryCode?: string
+  /** IANA timezone for the place, when the bundled data provides one. */
+  timezone?: string
 }

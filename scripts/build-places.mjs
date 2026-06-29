@@ -6,7 +6,7 @@
 //   node scripts/build-places.mjs --code US --label "United States" \
 //        --in data/places-src/us_zipcodes.csv --out public/places
 //
-// Compact row written: [zip, city, state, lat, lon, pop]
+// Compact row written: [zip, city, state, lat, lon, pop, timezone]
 //
 // --format simplemaps (default): CSV with header zip,lat,lon,timezone,city,state,population
 //   node scripts/build-places.mjs --code US --label "United States" --in data/places-src/us_zipcodes.csv
@@ -26,6 +26,9 @@ const label = arg('label')
 const inPath = arg('in')
 const outDir = arg('out', 'public/places')
 const format = arg('format', 'simplemaps')
+// IANA timezone to use when the source has no per-row timezone (e.g. a
+// single-timezone country like India: --tz Asia/Kolkata).
+const tzDefault = arg('tz', '')
 if (!code || !label || !inPath) {
   console.error('Missing required args: --code, --label, --in (see file header).')
   process.exit(1)
@@ -48,7 +51,7 @@ if (format === 'geonames-zip') {
     if (!zip || !city || Number.isNaN(lat) || Number.isNaN(lon)) continue
     if (seen.has(zip)) continue
     seen.add(zip)
-    rows.push([zip, city, state, round4(lat), round4(lon), 0])
+    rows.push([zip, city, state, round4(lat), round4(lon), 0, tzDefault])
   }
 } else {
   // SimpleMaps CSV (clean — no quoted fields / embedded commas).
@@ -62,8 +65,9 @@ if (format === 'geonames-zip') {
     const zip = f[col.zip], city = f[col.city], state = f[col.state]
     const lat = Number(f[col.lat]), lon = Number(f[col.lon])
     const pop = Math.round(Number(f[col.population] || 0))
+    const tz = ('timezone' in col ? f[col.timezone] : '') || tzDefault
     if (!zip || !city || Number.isNaN(lat) || Number.isNaN(lon)) continue
-    rows.push([zip, city, state, round4(lat), round4(lon), pop])
+    rows.push([zip, city, state, round4(lat), round4(lon), pop, tz])
   }
 }
 

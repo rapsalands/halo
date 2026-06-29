@@ -7,6 +7,8 @@ country is added (see below).
 
 ## How it works
 
+- Each row carries an IANA `timezone`; picking a place sets it as the clock's
+  offline fallback, so the time is right even before the weather feed loads.
 - Each country is a compact JSON at `public/places/<cc>.json`, an array of
   `[zip, city, state, lat, lon, population]` rows.
 - `public/places/index.json` lists the available countries.
@@ -32,9 +34,10 @@ node scripts/build-places.mjs --code US --label "United States" \
 
 # GeoNames postal dump (TSV, no header) — download <country>.zip from
 # https://download.geonames.org/export/zip/ and point --in at the .txt.
-# Rows are de-duplicated to one per postal code.
+# Rows are de-duplicated to one per postal code. GeoNames has no timezone, so
+# pass --tz for single-timezone countries (e.g. India = Asia/Kolkata).
 node scripts/build-places.mjs --code IN --label India --format geonames-zip \
-     --in data/places-src/in_postal_geonames.txt --out public/places
+     --tz Asia/Kolkata --in data/places-src/in_postal_geonames.txt --out public/places
 ```
 
 `places.ts` loads every country in the manifest and searches them together, so a
