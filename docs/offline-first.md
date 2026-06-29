@@ -9,33 +9,34 @@ must permit commercial use — free "non-commercial" tiers are off-limits.
 
 | Source | Live data? | Offline plan | Commercial | Status |
 |---|---|---|---|---|
-| Location (geocoding) | No | Bundled per-country datasets; GeoNames global tier | SimpleMaps/GeoNames CC BY 4.0 ✅ | **US done.** TODO: add global tier, drop Open-Meteo geocoder |
+| Location | No | Bundled per-country datasets (US ZIP/city); no network geocoder | SimpleMaps CC BY 4.0 ✅ | **Done — US only.** Add a country by dropping a CSV (places.md) |
 | Photos | No | Bundled `public/photos/<scene>/` + manifest | Curated commercial-licensed ✅ | **Pipeline done.** TODO: add real photos |
-| Holidays | No (deterministic) | Bundled per-country JSON (year window) + countries list; Nager fallback online | Open data ✅ | **Done** (see holidays.md) |
+| Holidays | No (deterministic) | Bundled per-country JSON (year window) + countries list | Open data ✅ | **Done** (see holidays.md) |
 | Quotes | No | Already bundled in `src/lib/quotes.ts` | own content ✅ | **Done** |
-| "On this day" | No | Bundled `public/onthisday.json` (Wikipedia, **CC BY-SA** — attribute); Wikipedia fallback online | CC BY-SA ⚠️ attribute | **Done** |
+| "On this day" | No | Bundled `public/onthisday.json` (Wikipedia, **CC BY-SA** — attribute) | CC BY-SA ⚠️ attribute | **Done** |
 | Fonts (Google Fonts) | No | Self-host Inter woff2 (latin+latin-ext) | OFL ✅ | **Done** |
-| IP auto-detect (ipapi.co) | — | Kiosk location is fixed → set once via picker, drop ipapi | n/a | TODO |
-| Weather forecast | **Yes** | Can't bundle. Self-host Open-Meteo (AGPL) or paid key | needs action ⚠️ | **Decision needed** |
-| Air quality | **Yes** | Same as weather (Open-Meteo) | needs action ⚠️ | **Decision needed** |
+| Weather forecast | **Yes** | Point at your self-hosted weather API via `VITE_WEATHER_API_BASE` | self-hosted ✅ | **Done** — configure base URL |
+| Air quality | **Yes** | Same, via `VITE_AIR_API_BASE` | self-hosted ✅ | **Done** — configure base URL |
+| IP auto-detect (ipapi.co) | — | Online-only convenience; kiosk location is normally set once via the picker | online ⚠️ | Kept as-is |
 | Crypto ticker (CoinGecko) | **Yes** | Prices are live; paid/commercial feed, or make tile online-only | needs action ⚠️ | **Decision needed** |
 
-## The big rock: weather + air quality
+## Live weather + air quality
 
-These are the only *essential* live feeds. The commercial-clean, dependency-free
-answer is to **self-host Open-Meteo** (open-source, AGPL) on your own
-server/LAN; kiosks hit that instead of `api.open-meteo.com`. That fixes both the
-licensing and the third-party-dependency concerns in one move. Alternative: buy
-Open-Meteo's commercial API key.
+These are the only *essential* live feeds and can't be bundled. The app no longer
+references any public provider: the base URLs come from `VITE_WEATHER_API_BASE`
+and `VITE_AIR_API_BASE` (see `.env.example`), so you point them at your own
+self-hosted weather server (same `/v1/forecast` and `/v1/air-quality` paths).
+Default is same-origin, so a reverse proxy that exposes the API under the kiosk's
+origin needs no config.
 
 ## Suggested order
 
 1. ~~Self-host fonts~~ ✅
 2. ~~Bundle holidays~~ ✅
 3. ~~Bundle quotes / "on this day"~~ ✅ (on-this-day text is CC BY-SA — keep attribution)
-4. Add GeoNames global location tier; drop the Open-Meteo geocoder.
-5. Self-hosted photos — add real images to the pipeline.
-6. Decide weather/AQI hosting (self-host Open-Meteo vs paid key).
+4. ~~Location offline (US)~~ ✅ — add more countries via CSV when shipping there
+5. ~~Weather/AQI base URLs externalized~~ ✅ — set them to your self-hosted server
+6. Self-hosted photos — add real images to the pipeline.
 7. Decide ticker (paid feed vs online-only tile).
 
 ## Attribution to keep

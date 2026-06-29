@@ -1,4 +1,5 @@
 import type { GeoLocation, Weather, DailyForecast, HourlyForecast } from '../store/appState'
+import { WEATHER_API_BASE } from '../lib/apiConfig'
 
 export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
   const params = new URLSearchParams({
@@ -10,8 +11,8 @@ export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
     timezone: 'auto',
     forecast_days: '7',
   })
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
-  if (!res.ok) throw new Error(`open-meteo ${res.status}`)
+  const res = await fetch(`${WEATHER_API_BASE}/v1/forecast?${params}`)
+  if (!res.ok) throw new Error(`weather ${res.status}`)
   const j = await res.json()
   const c = j.current
   const d = j.daily
@@ -41,7 +42,7 @@ export async function fetchWeather(loc: GeoLocation): Promise<Weather> {
   }
 }
 
-/** Map Open-Meteo hourly arrays into the next 12 hours from now. */
+/** Map the hourly arrays into the next 12 hours from now. */
 function buildHourly(h: { time: string[]; temperature_2m: number[]; weather_code: number[] } | undefined): HourlyForecast[] {
   if (!h?.time) return []
   const nowMs = Date.now()

@@ -4,7 +4,7 @@ import { fetchAirQuality } from './airQuality'
 afterEach(() => vi.restoreAllMocks())
 
 describe('fetchAirQuality', () => {
-  it('maps Open-Meteo air-quality payload', async () => {
+  it('maps the air-quality feed payload', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({
       ok: true,
       json: async () => ({ current: { us_aqi: 42, pm2_5: 9.1 } }),

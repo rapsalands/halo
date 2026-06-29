@@ -13,9 +13,14 @@ All data comes from free, no-key, public APIs. All configuration lives in each d
 - **Config portability** — export/import or `?config=` URL between screens
 - **24/7 resilience** — last-known-good caching, offline indicator, nightly auto-reload
 
-## Data sources (all free, no key)
+## Data sources
 
-Open-Meteo (weather + air quality), Nager.Date (holidays), Wikipedia REST (on this day), CoinGecko (crypto), Picsum (photos), ipapi.co (first-run geolocation).
+Offline-first: location (bundled US ZIP/city data), holidays, "on this day", and
+quotes are bundled and served locally; fonts and photos are self-hosted. Live
+feeds — weather + air quality — come from your own self-hosted weather API
+(configure `VITE_WEATHER_API_BASE` / `VITE_AIR_API_BASE`; see `.env.example`).
+The crypto ticker uses CoinGecko and first-run geolocation uses ipapi.co. See
+[docs/offline-first.md](docs/offline-first.md).
 
 ## Develop
 

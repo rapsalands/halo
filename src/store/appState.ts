@@ -30,8 +30,8 @@ export interface Weather {
   daily: DailyForecast[]
   hourly: HourlyForecast[]
   stale: boolean
-  /** IANA timezone for the location (from open-meteo timezone=auto); the clock
-   * renders in this zone so it matches the configured location, not the host. */
+  /** IANA timezone for the location (from the weather feed's timezone=auto); the
+   * clock renders in this zone so it matches the configured location, not the host. */
   timezone?: string
 }
 

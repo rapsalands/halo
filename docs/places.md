@@ -1,9 +1,9 @@
 # Offline location data
 
-The location search in Settings resolves places **offline-first**: it searches
-bundled per-country datasets and only falls back to the Open-Meteo geocoding API
-(global, keyless, free for non-commercial use, ~10k req/day) for countries we
-don't yet ship.
+The location search in Settings is **fully offline**: it searches bundled
+per-country datasets only — there is no network geocoder. Today only the US is
+bundled; a query with no local match simply returns no results until another
+country is added (see below).
 
 ## How it works
 

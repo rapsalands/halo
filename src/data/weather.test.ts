@@ -25,7 +25,7 @@ const SAMPLE = {
 }
 
 describe('fetchWeather', () => {
-  it('parses Open-Meteo current + daily into a Weather object', async () => {
+  it('parses the weather feed current + daily into a Weather object', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => SAMPLE })) as unknown as typeof fetch)
     const w = await fetchWeather({ lat: 28.6, lon: 77.2, name: 'Delhi' })
     expect(w.temp).toBe(24)            // rounded

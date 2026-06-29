@@ -6,7 +6,7 @@ import {
 } from '../store/defaults'
 import { useAppState } from '../store/appState'
 import { DEMO_NAMES } from '../lib/demo'
-import { geocodeSearch, ipLocate, type GeoResult } from '../data/geo'
+import { ipLocate, type GeoResult } from '../data/geo'
 import { loadPlaces, searchPlaces } from '../data/places'
 import { fetchCountries, type Country } from '../data/holidays'
 import { usePolledData } from '../hooks/usePolledData'
@@ -184,19 +184,18 @@ function CityAutocomplete() {
   // Warm the offline place data once the location field is in use.
   useEffect(() => { loadPlaces().catch(() => { /* offline / no manifest — fallback covers it */ }) }, [])
 
-  // Debounce the search. Try the bundled offline data first, then fall back to
-  // the network geocoder for places we don't ship (non-US today).
+  // Debounce the search over the bundled offline dataset (US today; add more
+  // countries by dropping a CSV and running `npm run build:places`).
   useEffect(() => {
     if (suppressSearch.current) { suppressSearch.current = false; return }
     const q = query.trim()
     let cancelled = false
     const id = setTimeout(async () => {
       if (q.length < 2) { if (!cancelled) { setResults([]); setOpen(false) } return }
-      let found = searchPlaces(q)
-      if (!found.length) {
-        try { found = await geocodeSearch(q) } catch { found = [] }
-      }
-      if (!cancelled) { setResults(found); setOpen(found.length > 0) }
+      try { await loadPlaces() } catch { /* no bundled data available */ }
+      if (cancelled) return
+      const found = searchPlaces(q)
+      setResults(found); setOpen(found.length > 0)
     }, 250)
     return () => { cancelled = true; clearTimeout(id) }
   }, [query])
@@ -257,7 +256,7 @@ function CityAutocomplete() {
       <button className="set-btn block" style={{ marginTop: 8 }} onClick={detect} disabled={detecting}>
         {detecting ? 'Detecting…' : 'Detect my location'}
       </button>
-      <span className="set-hint">Type a US city or ZIP (offline). Other countries resolve online.</span>
+      <span className="set-hint">Type a US city or ZIP code (offline).</span>
     </div>
   )
 }
