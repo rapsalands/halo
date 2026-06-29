@@ -1,4 +1,8 @@
 import type { Scene } from '../lib/weatherCodes'
+import { LOCAL_SCENE_PHOTOS } from './photoManifest'
+
+/** Offline build: never hotlink a remote photo CDN. */
+const OFFLINE = import.meta.env.VITE_OFFLINE === 'true'
 
 /** Build an Unsplash CDN url at a kiosk-friendly size. */
 const U = (id: string) =>
@@ -54,7 +58,13 @@ const IMAGES: Record<Scene, string[]> = {
   ],
 }
 
-/** All backdrop urls for a scene (length ≥ 1). */
+/**
+ * Backdrop urls for a scene. Prefer bundled local photos (offline,
+ * commercial-licensed); fall back to the remote CDN only in the online build.
+ */
 export function sceneImages(scene: Scene): string[] {
+  const local = LOCAL_SCENE_PHOTOS[scene] ?? []
+  if (local.length) return local
+  if (OFFLINE) return []
   return IMAGES[scene].map(U)
 }

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:places": "node scripts/build-places.mjs --code US --label \"United States\" --in data/places-src/us_zipcodes.csv --out public/places",
+    "build:photos": "node scripts/build-photos.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
