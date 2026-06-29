@@ -37,3 +37,31 @@ export function moonPhase(date: Date): MoonPhase {
 export function isDaytime(now: Date, sunrise: Date, sunset: Date): boolean {
   return now >= sunrise && now < sunset
 }
+
+const RAD = Math.PI / 180
+
+/**
+ * Sunrise/sunset (UTC instants) for a date and location, via the standard
+ * sunrise equation. Returns nulls during polar day/night. Used by providers
+ * (e.g. NWS) whose APIs don't supply sun times.
+ */
+export function sunTimes(date: Date, lat: number, lon: number): { sunrise: Date | null; sunset: Date | null } {
+  const jd = date.getTime() / DAY_MS + 2440587.5
+  const n = Math.ceil(jd - 2451545.0 + 0.0008)
+  const Jstar = n - lon / 360 // mean solar time (lon east-positive)
+  const M = (357.5291 + 0.98560028 * Jstar) % 360
+  const Mr = M * RAD
+  const C = 1.9148 * Math.sin(Mr) + 0.02 * Math.sin(2 * Mr) + 0.0003 * Math.sin(3 * Mr)
+  const lambda = (M + C + 180 + 102.9372) % 360
+  const lr = lambda * RAD
+  const Jtransit = 2451545.0 + Jstar + 0.0053 * Math.sin(Mr) - 0.0069 * Math.sin(2 * lr)
+  const sinDecl = Math.sin(lr) * Math.sin(23.4397 * RAD)
+  const cosDecl = Math.cos(Math.asin(sinDecl))
+  const latR = lat * RAD
+  const cosOmega = (Math.sin(-0.833 * RAD) - Math.sin(latR) * sinDecl) / (Math.cos(latR) * cosDecl)
+  if (cosOmega > 1) return { sunrise: null, sunset: null } // sun never rises
+  if (cosOmega < -1) return { sunrise: null, sunset: null } // sun never sets
+  const omega = Math.acos(cosOmega) / RAD
+  const fromJulian = (j: number) => new Date((j - 2440587.5) * DAY_MS)
+  return { sunrise: fromJulian(Jtransit - omega / 360), sunset: fromJulian(Jtransit + omega / 360) }
+}

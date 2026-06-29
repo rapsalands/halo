@@ -38,7 +38,15 @@ IP detect), so routing needs no extra lookup.
 3. Add a small adapter test that feeds a sample raw payload and asserts the
    viewmodel mapping.
 
-Planned providers (commercial-OK, free): **NWS** (US weather, no key) + **EPA
-AirNow** (US AQI); **IMD** (India weather) + **CPCB/data.gov.in** (India AQI);
-**OpenWeather** as a global fallback (weather + Air Pollution, all countries).
-See [offline-first.md](offline-first.md).
+## Providers
+
+- **`openMeteo`** (default, all countries) — self-hosted Open-Meteo-compatible.
+- **`nws`** (US weather) — `api.weather.gov`, free, no key, public domain.
+  Two-step (`/points` → forecast + hourly), `units=si` for Celsius, NWS text →
+  WMO codes (`textToWmo`), and sunrise/sunset computed via `sun.ts#sunTimes`
+  (NWS omits them). UV/feels-like aren't in the basic NWS feed (UV→0,
+  feels-like→temp).
+
+Planned next (commercial-OK, free): **EPA AirNow** (US AQI); **IMD** (India
+weather) + **CPCB/data.gov.in** (India AQI); **OpenWeather** as a global
+fallback. See [offline-first.md](offline-first.md).

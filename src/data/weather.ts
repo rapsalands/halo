@@ -1,14 +1,15 @@
 import type { GeoLocation, Weather } from '../store/appState'
 import type { WeatherProvider } from './providers/types'
 import { openMeteoWeather } from './providers/openMeteo'
+import { nwsWeather } from './providers/nws'
 
 /**
- * Per-country weather sources. Register a provider for a country code (e.g.
- * `US: nwsWeather`) and locations there use it; everything else uses the global
- * default. Every provider returns the same `Weather` viewmodel.
+ * Per-country weather sources. A location's country code routes to its provider;
+ * everything else uses the global default. Every provider returns the same
+ * `Weather` viewmodel.
  */
 const WEATHER_BY_COUNTRY: Record<string, WeatherProvider> = {
-  // US: nwsWeather,   // add when implemented
+  US: nwsWeather, // National Weather Service — free, public domain
   // IN: imdWeather,
 }
 const DEFAULT_WEATHER: WeatherProvider = openMeteoWeather

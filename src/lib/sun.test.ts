@@ -1,5 +1,28 @@
 import { describe, it, expect } from 'vitest'
-import { moonPhase, isDaytime } from './sun'
+import { moonPhase, isDaytime, sunTimes } from './sun'
+
+describe('sunTimes', () => {
+  const hours = (a: Date, b: Date) => (b.getTime() - a.getTime()) / 3_600_000
+
+  it('gives ~12h of daylight at the equator on an equinox', () => {
+    const { sunrise, sunset } = sunTimes(new Date('2026-03-20T12:00:00Z'), 0, 0)
+    expect(sunrise).not.toBeNull()
+    expect(hours(sunrise!, sunset!)).toBeCloseTo(12, 0)
+    expect(sunrise!.getTime()).toBeLessThan(sunset!.getTime())
+  })
+
+  it('gives a long (~15h) day in New York at the summer solstice', () => {
+    const { sunrise, sunset } = sunTimes(new Date('2026-06-21T12:00:00Z'), 40.71, -74.01)
+    expect(hours(sunrise!, sunset!)).toBeGreaterThan(14.5)
+    expect(hours(sunrise!, sunset!)).toBeLessThan(15.5)
+  })
+
+  it('returns nulls during polar day', () => {
+    const { sunrise, sunset } = sunTimes(new Date('2026-06-21T12:00:00Z'), 80, 0)
+    expect(sunrise).toBeNull()
+    expect(sunset).toBeNull()
+  })
+})
 
 describe('moonPhase', () => {
   it('identifies a known new moon (2025-12-20) by name bucket', () => {
