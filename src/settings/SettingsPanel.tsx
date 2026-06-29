@@ -333,7 +333,7 @@ function TilesTab({ onClose }: { onClose: () => void }) {
           </div>
         ))}
         <div className="set-row">
-          <Toggle label="Information Banner" checked={settings.showOnboardingBanner} onChange={(showOnboardingBanner) => update({ showOnboardingBanner })} />
+          <Toggle label="Information Banner" checked={settings.showInformationBanner} onChange={(showInformationBanner) => update({ showInformationBanner })} />
         </div>
       </Section>
     </>

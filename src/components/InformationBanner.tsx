@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSettings } from '../store/settings'
 import { useAppState } from '../store/appState'
+import { CloseButton } from './CloseButton'
 
 /** Rolling hints shown to a first-time kiosk user. Add freely — the banner
  * cross-fades through them. Copy is customer-facing (KioskMate). */
@@ -12,10 +13,10 @@ const HINTS = [
 
 const ROTATE_MS = 7000
 
-/** Fixed-bottom onboarding banner. Visible until the user dismisses it (which
- * persists via the showOnboardingBanner setting) or turns it off in settings. */
-export function OnboardingBanner() {
-  const show = useSettings((s) => s.settings.showOnboardingBanner)
+/** Fixed-bottom information banner. Visible until the user dismisses it (which
+ * persists via the showInformationBanner setting) or turns it off in settings. */
+export function InformationBanner() {
+  const show = useSettings((s) => s.settings.showInformationBanner)
   const update = useSettings((s) => s.update)
   const editMode = useAppState((s) => s.editMode)
   const [i, setI] = useState(0)
@@ -54,18 +55,11 @@ export function OnboardingBanner() {
           {HINTS[i]}
         </motion.span>
       </AnimatePresence>
-      <button
-        type="button"
-        aria-label="Hide this banner"
-        onClick={() => update({ showOnboardingBanner: false })}
-        style={{
-          position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-          background: 'transparent', border: 0, cursor: 'pointer',
-          color: 'rgba(255, 255, 255, 0.6)', fontSize: '1.2rem', lineHeight: 1,
-        }}
-      >
-        ×
-      </button>
+      <CloseButton
+        label="Hide this banner"
+        onClick={() => update({ showInformationBanner: false })}
+        style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)' }}
+      />
     </div>
   )
 }
