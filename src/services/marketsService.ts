@@ -1,3 +1,4 @@
+import { API } from './endpoints'
 export interface Coin { id: string; symbol: string; price: number; change24h: number }
 
 const SYMBOLS: Record<string, string> = {
@@ -11,7 +12,7 @@ export async function fetchMarkets(ids: string[], currency = 'usd'): Promise<Coi
     vs_currencies: cur,
     include_24hr_change: 'true',
   })
-  const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?${params}`)
+  const res = await fetch(`${API.coingecko}/simple/price?${params}`)
   if (!res.ok) throw new Error(`coingecko ${res.status}`)
   const j = await res.json()
   return ids

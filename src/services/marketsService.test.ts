@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { fetchMarkets } from './markets'
+import { fetchMarkets } from './marketsService'
 
 afterEach(() => vi.restoreAllMocks())
 

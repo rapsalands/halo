@@ -1,3 +1,4 @@
+import { API } from '../endpoints'
 import type { GeoLocation } from '../../store/appState'
 import { DATA_GOV_IN_KEY } from '../../lib/apiConfig'
 import { aqiFromPm25 } from '../../lib/aqi'
@@ -9,7 +10,7 @@ import type { AirQualityProvider } from './types'
  * nearest station's PM2.5 and express it on the US-AQI scale the UI uses (so it
  * matches other providers). Needs VITE_DATA_GOV_IN_KEY.
  */
-const RESOURCE = 'https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69'
+const RESOURCE = API.cpcbResource
 
 interface CpcbRecord {
   latitude?: string

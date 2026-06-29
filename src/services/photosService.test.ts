@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { photoUrl, photoSequence } from './photos'
+import { photoUrl, photoSequence } from './photosService'
 
 describe('photos', () => {
   it('builds a Picsum seeded URL at the requested size', () => {

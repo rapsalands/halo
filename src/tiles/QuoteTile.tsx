@@ -2,7 +2,7 @@ import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
 import { usePolledData } from '../hooks/usePolledData'
 import { pickDailyQuote } from '../lib/quotes'
-import { fetchOnThisDay, type OnThisDay } from '../data/onThisDay'
+import { fetchOnThisDay, type OnThisDay } from '../services/onThisDayService'
 
 const SIX_H = 6 * 60 * 60_000
 

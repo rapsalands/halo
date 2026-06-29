@@ -3,7 +3,7 @@ import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { usePolledData } from '../hooks/usePolledData'
 import { buildMonthGrid, isoOf } from '../lib/calendar'
-import { fetchHolidays, type Holiday } from '../data/holidays'
+import { fetchHolidays, type Holiday } from '../services/holidaysService'
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']

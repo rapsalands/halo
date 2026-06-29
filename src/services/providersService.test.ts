@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { weatherProviderFor } from './weather'
-import { airProviderFor } from './airQuality'
+import { weatherProviderFor } from './weatherService'
+import { airProviderFor } from './airQualityService'
 
 const loc = (countryCode?: string) => ({ lat: 1, lon: 2, name: 'x', countryCode })
 

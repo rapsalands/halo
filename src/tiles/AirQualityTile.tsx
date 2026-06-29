@@ -1,7 +1,7 @@
 import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
 import { usePolledData } from '../hooks/usePolledData'
-import { fetchAirQuality, type AirQuality } from '../data/airQuality'
+import { fetchAirQuality, type AirQuality } from '../services/airQualityService'
 import { aqiCategory } from '../lib/aqi'
 
 const AQI_INTERVAL = 30 * 60_000

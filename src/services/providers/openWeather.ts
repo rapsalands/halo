@@ -1,3 +1,4 @@
+import { API } from '../endpoints'
 import type { GeoLocation, DailyForecast, HourlyForecast } from '../../store/appState'
 import { OPENWEATHER_KEY } from '../../lib/apiConfig'
 import { aqiFromPm25 } from '../../lib/aqi'
@@ -11,7 +12,7 @@ import { toLocalIso } from './util'
  * VITE_OPENWEATHER_KEY. Used as the global fallback for any country without a
  * dedicated provider.
  */
-const BASE = 'https://api.openweathermap.org'
+const BASE = API.openWeather
 
 /** OpenWeather condition id → WMO code. */
 export function owmToWmo(id: number): number {

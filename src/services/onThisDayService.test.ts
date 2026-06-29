@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { fetchOnThisDay } from './onThisDay'
+import { fetchOnThisDay } from './onThisDayService'
 
 afterEach(() => vi.restoreAllMocks())
 

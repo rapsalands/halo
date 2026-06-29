@@ -1,3 +1,4 @@
+import { API } from './endpoints'
 export interface OnThisDay { year: number; text: string }
 
 /** Offline build: never reach for Wikipedia. */
@@ -21,7 +22,7 @@ export async function fetchOnThisDay(date: Date): Promise<OnThisDay | null> {
   } catch { /* fall through to network */ }
 
   if (OFFLINE) return null
-  const res = await fetch(`https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`)
+  const res = await fetch(`${API.wikipediaOnThisDay}/${mm}/${dd}`)
   if (!res.ok) throw new Error(`onthisday ${res.status}`)
   const j = await res.json()
   const first = j.events?.[0]

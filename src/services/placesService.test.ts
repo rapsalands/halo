@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ingestPlaces, searchPlaces, placesReady, resetPlaces, type CompactRow } from './places'
+import { ingestPlaces, searchPlaces, placesReady, resetPlaces, type CompactRow } from './placesService'
 
 const US: CompactRow[] = [
   ['10001', 'New York', 'NY', 40.7506, -73.9971, 21102, 'America/New_York'],

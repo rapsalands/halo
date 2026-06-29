@@ -1,3 +1,4 @@
+import { API } from '../endpoints'
 import type { GeoLocation, DailyForecast, HourlyForecast } from '../../store/appState'
 import { sunTimes } from '../../lib/sun'
 import type { WeatherProvider } from './types'
@@ -9,7 +10,7 @@ import { toLocalIso } from './util'
  * request `units=si` (Celsius, km/h) to match the viewmodel, map NWS's text
  * conditions to WMO codes, and compute sunrise/sunset locally (NWS omits them).
  */
-const BASE = 'https://api.weather.gov'
+const BASE = API.nws
 
 interface NwsPeriod {
   startTime: string

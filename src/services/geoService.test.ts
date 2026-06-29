@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { ipLocate } from './geo'
+import { ipLocate } from './geoService'
 
 afterEach(() => vi.restoreAllMocks())
 

@@ -1,3 +1,4 @@
+import { API } from '../endpoints'
 import type { GeoLocation } from '../../store/appState'
 import { AIRNOW_KEY } from '../../lib/apiConfig'
 import { pm25FromAqi } from '../../lib/aqi'
@@ -9,7 +10,7 @@ import type { AirQualityProvider } from './types'
  * concentration), so the overall AQI is the max across pollutants and we derive
  * PM2.5 concentration from its AQI. Needs VITE_AIRNOW_KEY.
  */
-const BASE = 'https://www.airnowapi.org'
+const BASE = API.airNow
 
 interface AirNowObs { ParameterName: string; AQI: number }
 

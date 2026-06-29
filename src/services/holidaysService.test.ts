@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { fetchHolidays, fetchCountries } from './holidays'
+import { fetchHolidays, fetchCountries } from './holidaysService'
 
 /** Mock fetch that responds based on a substring match of the requested URL. */
 function mockFetch(map: Record<string, unknown>) {

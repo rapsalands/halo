@@ -1,3 +1,4 @@
+import { API } from './endpoints'
 export interface Holiday { date: string; name: string }
 
 export interface Country { code: string; name: string }
@@ -18,7 +19,7 @@ export async function fetchCountries(): Promise<Country[]> {
     }
   } catch { /* fall through to network */ }
   if (OFFLINE) return []
-  const res = await fetch('https://date.nager.at/api/v3/AvailableCountries')
+  const res = await fetch(`${API.nager}/AvailableCountries`)
   if (!res.ok) throw new Error(`nager countries ${res.status}`)
   const j = await res.json()
   return (j as Array<{ countryCode: string; name: string }>)
@@ -40,7 +41,7 @@ export async function fetchHolidays(year: number, country: string): Promise<Holi
     }
   } catch { /* fall through to network */ }
   if (OFFLINE) return []
-  const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`)
+  const res = await fetch(`${API.nager}/PublicHolidays/${year}/${country}`)
   if (!res.ok) throw new Error(`nager ${res.status}`)
   const j = await res.json()
   return (j as Array<{ date: string; localName?: string; name: string }>).map((h) => ({

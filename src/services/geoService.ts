@@ -1,7 +1,8 @@
+import { API } from './endpoints'
 import type { GeoLocation } from '../store/appState'
 
 export async function ipLocate(): Promise<GeoLocation> {
-  const res = await fetch('https://ipapi.co/json/')
+  const res = await fetch(`${API.ipapi}/json/`)
   if (!res.ok) throw new Error(`ipapi ${res.status}`)
   const j = await res.json()
   if (typeof j.latitude !== 'number' || typeof j.longitude !== 'number') {

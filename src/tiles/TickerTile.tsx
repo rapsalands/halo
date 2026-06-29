@@ -1,7 +1,7 @@
 import { usePolledData } from '../hooks/usePolledData'
 import { useSettings } from '../store/settings'
 import { TICKER_CURRENCIES } from '../store/defaults'
-import { fetchMarkets, type Coin } from '../data/markets'
+import { fetchMarkets, type Coin } from '../services/marketsService'
 
 const INTERVAL = 8 * 60_000
 

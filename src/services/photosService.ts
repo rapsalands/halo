@@ -1,10 +1,11 @@
+import { API } from './endpoints'
 import { LOCAL_PHOTO_POOL } from '../background/photoManifest'
 
 /** Offline build: never hotlink a remote photo CDN. */
 const OFFLINE = import.meta.env.VITE_OFFLINE === 'true'
 
 export function photoUrl(seed: string | number, w: number, h: number): string {
-  return `https://picsum.photos/seed/${seed}/${w}/${h}`
+  return `${API.picsum}/seed/${seed}/${w}/${h}`
 }
 
 /**

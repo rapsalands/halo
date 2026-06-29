@@ -1,4 +1,4 @@
-import type { GeoResult } from './geo'
+import type { GeoResult } from './geoService'
 
 /**
  * Offline, per-country place search. Each country ships as a compact JSON

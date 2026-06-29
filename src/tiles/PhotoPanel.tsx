@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { photoSequence } from '../data/photos'
+import { photoSequence } from '../services/photosService'
 
 const ROTATE_MS = 9000 // visibly cycle the slideshow
 
