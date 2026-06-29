@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export interface GeoLocation { lat: number; lon: number; name: string }
+export interface GeoLocation { lat: number; lon: number; name: string; countryCode?: string }
 
 export interface DailyForecast {
   date: string

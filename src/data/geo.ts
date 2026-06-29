@@ -7,7 +7,10 @@ export async function ipLocate(): Promise<GeoLocation> {
   if (typeof j.latitude !== 'number' || typeof j.longitude !== 'number') {
     throw new Error('ipapi: no coordinates')
   }
-  return { lat: j.latitude, lon: j.longitude, name: j.city ?? 'Current location' }
+  return {
+    lat: j.latitude, lon: j.longitude, name: j.city ?? 'Current location',
+    countryCode: typeof j.country_code === 'string' ? j.country_code : undefined,
+  }
 }
 
 /** One place match, with enough context to disambiguate same-named places. */

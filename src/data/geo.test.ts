@@ -10,7 +10,7 @@ describe('ipLocate', () => {
       json: async () => ({ latitude: 28.6, longitude: 77.2, city: 'Delhi', country_code: 'IN' }),
     })) as unknown as typeof fetch)
     const loc = await ipLocate()
-    expect(loc).toEqual({ lat: 28.6, lon: 77.2, name: 'Delhi' })
+    expect(loc).toEqual({ lat: 28.6, lon: 77.2, name: 'Delhi', countryCode: 'IN' })
   })
 
   it('throws on a non-ok response', async () => {

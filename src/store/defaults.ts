@@ -55,7 +55,7 @@ export interface Settings {
   tileLayout: LayoutItem[]
   /** Schema version of tileLayout; mismatched persisted layouts are reset. */
   layoutVersion: number
-  location: { lat: number; lon: number; name: string } | null // null = auto-detect
+  location: { lat: number; lon: number; name: string; countryCode?: string } | null // null = auto-detect
   /** IANA timezone fallback for the clock when there is no weather feed (offline).
    *  The kiosk injects it via ?config=. Does NOT disable IP auto-detect. */
   timezone: string | null
