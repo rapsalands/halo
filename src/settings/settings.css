@@ -176,6 +176,8 @@ select.set-input { cursor: pointer; appearance: none; -webkit-appearance: none; 
 /* Native option lists can't inherit the glass theme; keep them dark + legible. */
 select.set-input option { background: #141a26; color: #fff; }
 
+.set-hint { display: block; margin-top: 8px; font-size: 0.72rem; color: rgba(255, 255, 255, 0.5); line-height: 1.35; }
+
 /* Location autocomplete ----------------------------------------------- */
 .set-ac { position: relative; }
 .set-ac-list {

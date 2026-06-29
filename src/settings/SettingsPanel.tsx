@@ -7,6 +7,7 @@ import {
 import { useAppState } from '../store/appState'
 import { DEMO_NAMES } from '../lib/demo'
 import { geocodeSearch, ipLocate, type GeoResult } from '../data/geo'
+import { loadPlaces, searchPlaces } from '../data/places'
 import { fetchCountries, type Country } from '../data/holidays'
 import { usePolledData } from '../hooks/usePolledData'
 import { fetchWithFallback } from '../lib/fetchWithFallback'
@@ -180,16 +181,22 @@ function CityAutocomplete() {
   // so it doesn't pop a results dropdown for the value we just inserted.
   const suppressSearch = useRef(false)
 
-  // Debounce the network search so we don't fire a request on every keystroke.
+  // Warm the offline place data once the location field is in use.
+  useEffect(() => { loadPlaces().catch(() => { /* offline / no manifest — fallback covers it */ }) }, [])
+
+  // Debounce the search. Try the bundled offline data first, then fall back to
+  // the network geocoder for places we don't ship (non-US today).
   useEffect(() => {
     if (suppressSearch.current) { suppressSearch.current = false; return }
     const q = query.trim()
     let cancelled = false
-    const id = setTimeout(() => {
+    const id = setTimeout(async () => {
       if (q.length < 2) { if (!cancelled) { setResults([]); setOpen(false) } return }
-      geocodeSearch(q)
-        .then((found) => { if (!cancelled) { setResults(found); setOpen(true) } })
-        .catch(() => { if (!cancelled) setResults([]) })
+      let found = searchPlaces(q)
+      if (!found.length) {
+        try { found = await geocodeSearch(q) } catch { found = [] }
+      }
+      if (!cancelled) { setResults(found); setOpen(found.length > 0) }
     }, 250)
     return () => { cancelled = true; clearTimeout(id) }
   }, [query])
@@ -250,6 +257,7 @@ function CityAutocomplete() {
       <button className="set-btn block" style={{ marginTop: 8 }} onClick={detect} disabled={detecting}>
         {detecting ? 'Detecting…' : 'Detect my location'}
       </button>
+      <span className="set-hint">Type a US city or ZIP (offline). Other countries resolve online.</span>
     </div>
   )
 }
