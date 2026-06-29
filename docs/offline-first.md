@@ -11,9 +11,9 @@ must permit commercial use — free "non-commercial" tiers are off-limits.
 |---|---|---|---|---|
 | Location (geocoding) | No | Bundled per-country datasets; GeoNames global tier | SimpleMaps/GeoNames CC BY 4.0 ✅ | **US done.** TODO: add global tier, drop Open-Meteo geocoder |
 | Photos | No | Bundled `public/photos/<scene>/` + manifest | Curated commercial-licensed ✅ | **Pipeline done.** TODO: add real photos |
-| Holidays | No (deterministic) | Bundle/precompute per country+year; drop Nager call | Open data ✅ | TODO |
+| Holidays | No (deterministic) | Bundled per-country JSON (year window) + countries list; Nager fallback online | Open data ✅ | **Done** (see holidays.md) |
 | Quotes / "on this day" | No | Bundle a curated dataset; drop Wikipedia call | CC content ✅ | TODO |
-| Fonts (Google Fonts) | No | Self-host woff2 locally | OFL ✅ | TODO |
+| Fonts (Google Fonts) | No | Self-host Inter woff2 (latin+latin-ext) | OFL ✅ | **Done** |
 | IP auto-detect (ipapi.co) | — | Kiosk location is fixed → set once via picker, drop ipapi | n/a | TODO |
 | Weather forecast | **Yes** | Can't bundle. Self-host Open-Meteo (AGPL) or paid key | needs action ⚠️ | **Decision needed** |
 | Air quality | **Yes** | Same as weather (Open-Meteo) | needs action ⚠️ | **Decision needed** |
@@ -29,11 +29,15 @@ Open-Meteo's commercial API key.
 
 ## Suggested order
 
-1. Self-host fonts (quick, removes a Google dependency).
-2. Drop ipapi auto-detect (location is configured via the picker now).
-3. Bundle holidays + quotes (deterministic, removes two API calls).
+1. ~~Self-host fonts~~ ✅
+2. ~~Bundle holidays~~ ✅
+3. Bundle quotes / "on this day" (deterministic, removes Wikipedia call).
 4. Add GeoNames global location tier; drop the Open-Meteo geocoder.
-5. Decide weather/AQI hosting (self-host Open-Meteo vs paid key).
-6. Decide ticker (paid feed vs online-only tile).
+5. Self-hosted photos — add real images to the pipeline.
+6. Decide weather/AQI hosting (self-host Open-Meteo vs paid key).
+7. Decide ticker (paid feed vs online-only tile).
+
+Note: ipapi "Detect my location" is kept as an online-only convenience (the
+kiosk's location is normally configured once via the picker).
 
 See also: [places.md](places.md), [photos.md](photos.md).
