@@ -2,6 +2,7 @@ import type { GeoLocation, Weather } from '../store/appState'
 import type { WeatherProvider } from './providers/types'
 import { nwsWeather } from './providers/nws'
 import { openWeatherWeather } from './providers/openWeather'
+import { fallbackWeather } from './providers/util'
 
 /**
  * Per-country weather sources. A location's country code routes to its provider;
@@ -10,7 +11,7 @@ import { openWeatherWeather } from './providers/openWeather'
  * self-hosted setups — register it here to use it.)
  */
 const WEATHER_BY_COUNTRY: Record<string, WeatherProvider> = {
-  US: nwsWeather, // National Weather Service — free, public domain
+  US: fallbackWeather(nwsWeather, openWeatherWeather), // NWS, then OpenWeather if it fails
   // IN: imdWeather, // IMD needs IP-whitelisting; India falls back to OpenWeather
 }
 const DEFAULT_WEATHER: WeatherProvider = openWeatherWeather
