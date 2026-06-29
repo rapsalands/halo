@@ -11,3 +11,8 @@
  */
 export const WEATHER_API_BASE: string = import.meta.env.VITE_WEATHER_API_BASE ?? ''
 export const AIR_API_BASE: string = import.meta.env.VITE_AIR_API_BASE ?? ''
+
+/** API keys for free-tier commercial providers (see docs/weather-providers.md). */
+export const OPENWEATHER_KEY: string = import.meta.env.VITE_OPENWEATHER_KEY ?? ''
+export const AIRNOW_KEY: string = import.meta.env.VITE_AIRNOW_KEY ?? ''
+export const DATA_GOV_IN_KEY: string = import.meta.env.VITE_DATA_GOV_IN_KEY ?? ''

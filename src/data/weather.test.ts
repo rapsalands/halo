@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { fetchWeather } from './weather'
+import { openMeteoWeather } from './providers/openMeteo'
+
+const fetchWeather = openMeteoWeather.fetchWeather
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -24,7 +26,7 @@ const SAMPLE = {
   },
 }
 
-describe('fetchWeather', () => {
+describe('openMeteo weather adapter', () => {
   it('parses the weather feed current + daily into a Weather object', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => SAMPLE })) as unknown as typeof fetch)
     const w = await fetchWeather({ lat: 28.6, lon: 77.2, name: 'Delhi' })

@@ -5,14 +5,16 @@ import { airProviderFor } from './airQuality'
 const loc = (countryCode?: string) => ({ lat: 1, lon: 2, name: 'x', countryCode })
 
 describe('provider selection', () => {
-  it('routes US weather to NWS and other countries to the default', () => {
+  it('routes weather by country, falling back to OpenWeather', () => {
     expect(weatherProviderFor(loc('US')).id).toBe('nws')
-    expect(weatherProviderFor(loc()).id).toBe('open-meteo')
-    expect(weatherProviderFor(loc('FR')).id).toBe('open-meteo')
+    expect(weatherProviderFor(loc('IN')).id).toBe('openweather') // India weather via fallback
+    expect(weatherProviderFor(loc('FR')).id).toBe('openweather')
+    expect(weatherProviderFor(loc()).id).toBe('openweather')
   })
 
-  it('uses the default air-quality provider until a country one is registered', () => {
-    expect(airProviderFor(loc('US')).id).toBe('open-meteo')
-    expect(airProviderFor(loc('IN')).id).toBe('open-meteo')
+  it('routes air quality by country, falling back to OpenWeather', () => {
+    expect(airProviderFor(loc('US')).id).toBe('airnow')
+    expect(airProviderFor(loc('IN')).id).toBe('cpcb')
+    expect(airProviderFor(loc('FR')).id).toBe('openweather')
   })
 })

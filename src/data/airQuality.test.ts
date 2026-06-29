@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { fetchAirQuality } from './airQuality'
+import { openMeteoAir } from './providers/openMeteo'
+
+const fetchAirQuality = openMeteoAir.fetchAirQuality
 
 afterEach(() => vi.restoreAllMocks())
 
-describe('fetchAirQuality', () => {
+describe('openMeteo air adapter', () => {
   it('maps the air-quality feed payload', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({
       ok: true,

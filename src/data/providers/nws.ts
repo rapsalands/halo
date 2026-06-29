@@ -1,6 +1,7 @@
 import type { GeoLocation, DailyForecast, HourlyForecast } from '../../store/appState'
 import { sunTimes } from '../../lib/sun'
 import type { WeatherProvider } from './types'
+import { toLocalIso } from './util'
 
 /**
  * US National Weather Service (api.weather.gov) — free, no key, public-domain
@@ -39,17 +40,6 @@ export function textToWmo(text: string): number {
   if (t.includes('mostly clear')) return 1
   if (t.includes('clear') || t.includes('sunny') || t.includes('fair')) return 0
   return 2
-}
-
-/** Format a UTC instant as a naive local "YYYY-MM-DDTHH:mm" in `timeZone`. */
-function toLocalIso(d: Date, timeZone: string): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(d)
-  const g = (t: string) => parts.find((p) => p.type === t)!.value
-  const hh = g('hour') === '24' ? '00' : g('hour')
-  return `${g('year')}-${g('month')}-${g('day')}T${hh}:${g('minute')}`
 }
 
 function buildDaily(periods: NwsPeriod[], loc: GeoLocation, tz: string): DailyForecast[] {
