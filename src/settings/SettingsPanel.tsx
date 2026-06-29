@@ -256,7 +256,7 @@ function CityAutocomplete() {
       <button className="set-btn block" style={{ marginTop: 8 }} onClick={detect} disabled={detecting}>
         {detecting ? 'Detecting…' : 'Detect my location'}
       </button>
-      <span className="set-hint">Type a US city or ZIP code (offline).</span>
+      <span className="set-hint">Type a city or postal code — US ZIP or India PIN (offline).</span>
     </div>
   )
 }

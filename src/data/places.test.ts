@@ -46,7 +46,29 @@ describe('places search', () => {
     expect(searchPlaces('springfield', 2)).toHaveLength(2)
   })
 
-  it('returns nothing for an unknown place (caller falls back to network)', () => {
-    expect(searchPlaces('london')).toEqual([])
+  it('returns nothing for an unknown place', () => {
+    expect(searchPlaces('paris')).toEqual([])
+  })
+})
+
+describe('places search — multiple countries', () => {
+  const IN: CompactRow[] = [
+    ['400008', 'Mumbai Central', 'Maharashtra', 18.9712, 72.8194, 0],
+    ['110001', 'New Delhi G.P.O.', 'Delhi', 28.6139, 77.209, 0],
+  ]
+  beforeEach(() => {
+    resetPlaces()
+    ingestPlaces('US', 'United States', US)
+    ingestPlaces('IN', 'India', IN)
+  })
+
+  it('matches a city in either country with the right country label', () => {
+    const r = searchPlaces('mumbai')
+    expect(r[0]).toMatchObject({ name: 'Mumbai Central', admin1: 'Maharashtra', country: 'India', countryCode: 'IN' })
+  })
+
+  it('matches a 6-digit India PIN as well as a 5-digit US ZIP', () => {
+    expect(searchPlaces('110001')[0]).toMatchObject({ name: 'New Delhi G.P.O.', countryCode: 'IN' })
+    expect(searchPlaces('10001')[0]).toMatchObject({ name: 'New York', countryCode: 'US' })
   })
 })

@@ -22,18 +22,29 @@ country is added (see below).
 Drop the source CSV in `data/places-src/` and run the build script. The script
 distills the CSV and upserts the manifest:
 
+Two input formats are supported via `--format`:
+
 ```bash
-# US (already wired as `npm run build:places`)
+# SimpleMaps CSV (default) — header: zip,lat,lon,timezone,city,state,population
+# US is wired as `npm run build:places`:
 node scripts/build-places.mjs --code US --label "United States" \
      --in data/places-src/us_zipcodes.csv --out public/places
 
-# Another country (GeoNames per-country dumps work well — map their columns
-# into a zip,lat,lon,...,city,state,population CSV first):
-node scripts/build-places.mjs --code GB --label "United Kingdom" \
-     --in data/places-src/gb.csv --out public/places
+# GeoNames postal dump (TSV, no header) — download <country>.zip from
+# https://download.geonames.org/export/zip/ and point --in at the .txt.
+# Rows are de-duplicated to one per postal code.
+node scripts/build-places.mjs --code IN --label India --format geonames-zip \
+     --in data/places-src/in_postal_geonames.txt --out public/places
 ```
 
+`places.ts` loads every country in the manifest and searches them together, so a
+numeric query matches any country's postal codes (US ZIP, India PIN, …) and a
+text query matches city/place names across all bundled countries.
+
 Commit the regenerated `public/places/*.json` and `index.json`.
+
+Currently bundled: **US** (SimpleMaps ZIP/city) and **India** (GeoNames PIN, one
+representative locality per pincode).
 
 ## Attribution
 
