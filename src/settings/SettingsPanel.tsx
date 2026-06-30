@@ -106,12 +106,14 @@ function DisplayTab() {
   return (
     <>
       <div className="set-col">
-        <span className="set-label">Performance</span>
-        <Segmented<Performance>
-          wide value={settings.performance}
-          options={[{ value: 'high', label: 'High' }, { value: 'low', label: 'Low' }]}
-          onChange={(performance) => update({ performance })}
-        />
+        <span id="perf-label" className="set-label">Performance</span>
+        <div role="group" aria-labelledby="perf-label">
+          <Segmented<Performance>
+            wide value={settings.performance}
+            options={[{ value: 'high', label: 'High' }, { value: 'low', label: 'Low' }]}
+            onChange={(performance) => update({ performance })}
+          />
+        </div>
       </div>
       <div className="set-row">
         <Toggle label="Companion (sun / moon)" checked={settings.companion} onChange={(companion) => update({ companion })} />
@@ -363,12 +365,14 @@ function TickerTab() {
         />
       </div>
       <div className="set-col">
-        <span className="set-label">Currency</span>
-        <Segmented<string>
-          wide value={settings.tickerCurrency}
-          options={CURRENCY_OPTS}
-          onChange={(tickerCurrency) => update({ tickerCurrency })}
-        />
+        <span id="currency-label" className="set-label">Currency</span>
+        <div role="group" aria-labelledby="currency-label">
+          <Segmented<string>
+            wide value={settings.tickerCurrency}
+            options={CURRENCY_OPTS}
+            onChange={(tickerCurrency) => update({ tickerCurrency })}
+          />
+        </div>
       </div>
     </>
   )
@@ -412,15 +416,15 @@ function AdvancedTab() {
           <Toggle label="Auto-dim at night" checked={settings.nightDim} onChange={(nightDim) => update({ nightDim })} />
         </div>
         <div className="set-row">
-          <span>From</span>
-          <select className="set-input" style={{ width: 110 }} value={settings.dimStart}
+          <label htmlFor="dim-start">From</label>
+          <select id="dim-start" className="set-input" style={{ width: 110 }} value={settings.dimStart}
             onChange={(e) => update({ dimStart: Number(e.target.value) })}>
             {HOURS.map((h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
           </select>
         </div>
         <div className="set-row">
-          <span>To</span>
-          <select className="set-input" style={{ width: 110 }} value={settings.dimEnd}
+          <label htmlFor="dim-end">To</label>
+          <select id="dim-end" className="set-input" style={{ width: 110 }} value={settings.dimEnd}
             onChange={(e) => update({ dimEnd: Number(e.target.value) })}>
             {HOURS.map((h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
           </select>
@@ -456,6 +460,10 @@ function AdvancedTab() {
 export function SettingsPanel() {
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<TabId>('display')
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Move focus into the dialog when it opens so keyboard/AT users land inside it.
+  useEffect(() => { if (open) panelRef.current?.focus() }, [open])
 
   function moveTab(dir: 1 | -1) {
     const i = TABS.findIndex((t) => t.id === tab)
@@ -475,10 +483,11 @@ export function SettingsPanel() {
           data-testid="settings-overlay"
           className="set-scrim"
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
         >
-          <div className="set-panel">
+          <div className="set-panel" ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="set-title" tabIndex={-1}>
             <div className="set-head">
-              <h2>Settings</h2>
+              <h2 id="set-title">Settings</h2>
               <button className="set-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
             </div>
 

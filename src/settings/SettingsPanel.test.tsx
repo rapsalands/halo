@@ -88,6 +88,24 @@ describe('SettingsPanel', () => {
     await userEvent.keyboard('{ArrowRight}')
     expect(screen.getByRole('tab', { name: /clock/i })).toHaveFocus()
   })
+
+  it('exposes the panel as a labelled modal dialog', async () => {
+    await openPanel()
+    expect(screen.getByRole('dialog', { name: /settings/i })).toBeInTheDocument()
+  })
+
+  it('closes on Escape', async () => {
+    await openPanel()
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByTestId('settings-overlay')).toBeNull()
+  })
+
+  it('labels the overnight dimming hour selects', async () => {
+    await openPanel()
+    await selectTab(/advanced/i)
+    expect(screen.getByLabelText('From')).toBeInTheDocument()
+    expect(screen.getByLabelText('To')).toBeInTheDocument()
+  })
 })
 
 describe('SettingsPanel — Tiles tab layout controls', () => {
