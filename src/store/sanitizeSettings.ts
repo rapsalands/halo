@@ -20,8 +20,6 @@ export function sanitizeSettings(input: unknown): Partial<Settings> {
   const out: Partial<Settings> = {}
 
   // Enums
-  if (inEnum(input.layout, LAYOUTS)) out.layout = input.layout
-  if (inEnum(input.backgroundMode, BACKGROUND_MODES)) out.backgroundMode = input.backgroundMode
   if (inEnum(input.performance, PERFORMANCES)) out.performance = input.performance
   if (inEnum(input.units, UNITS)) out.units = input.units
   if (inEnum(input.preview, PREVIEWS)) out.preview = input.preview
@@ -75,8 +73,6 @@ export function sanitizeSettings(input: unknown): Partial<Settings> {
 
 const TILE_IDS = Object.keys(DEFAULT_SETTINGS.enabledTiles) as RegionId[]
 
-const LAYOUTS = ['photo-first', 'bento'] as const
-const BACKGROUND_MODES = ['weather', 'photo'] as const
 const PERFORMANCES = ['low', 'high'] as const
 const UNITS = ['metric', 'imperial'] as const
 const PREVIEWS = [

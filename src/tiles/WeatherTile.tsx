@@ -45,10 +45,6 @@ export function WeatherTile() {
         </div>
       </div>
 
-      {weather.stale && (
-        <div style={{ fontSize: '0.7rem', color: '#ffd27e', marginTop: 4 }}>· offline, last update</div>
-      )}
-
       {hours.length > 0 && (
         <div style={{ display: 'flex', gap: 8, marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 8, justifyContent: 'space-between' }}>
           {hours.map((h) => (

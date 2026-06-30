@@ -20,7 +20,9 @@ interface SettingsState {
 }
 
 export const useSettings = create<SettingsState>((set, get) => ({
-  settings: DEFAULT_SETTINGS,
+  // Clone so the live state never aliases the shared DEFAULT_SETTINGS constant
+  // (its nested tileLayout/enabledTiles objects could otherwise be mutated).
+  settings: structuredClone(DEFAULT_SETTINGS),
   load: () => {
     try {
       const cached = loadCache<Partial<Settings>>(KEY)
@@ -52,5 +54,5 @@ export const useSettings = create<SettingsState>((set, get) => ({
     saveCache(KEY, next)
     set({ settings: next })
   },
-  reset: () => set({ settings: DEFAULT_SETTINGS }),
+  reset: () => set({ settings: structuredClone(DEFAULT_SETTINGS) }),
 }))

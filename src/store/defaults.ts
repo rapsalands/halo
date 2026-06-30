@@ -1,7 +1,5 @@
 export type Units = 'metric' | 'imperial'
-export type BackgroundMode = 'weather' | 'photo'
 export type Performance = 'low' | 'high'
-export type LayoutPreset = 'photo-first' | 'bento'
 export type RegionId =
   | 'clock' | 'weather' | 'air' | 'calendar' | 'quote'
   | 'sunmoon' | 'forecast' | 'photo' | 'ticker'
@@ -21,7 +19,6 @@ export const GRID_ROWS = 18
  *  from an older grid are discarded instead of rendering mis-sized. */
 export const LAYOUT_VERSION = 3
 
-/** Default bento mapped onto the 12-col × 12-row grid (matches the old PLACEMENT). */
 // Mapped onto a 12-col × 18-row grid. Heights match each tile's content so the
 // default view fills the screen without overflow; the ticker is a single thin row.
 export const DEFAULT_LAYOUT: LayoutItem[] = [
@@ -47,8 +44,6 @@ export type Preview =
   | 'night-rain' | 'night-thunder'
 
 export interface Settings {
-  layout: LayoutPreset
-  backgroundMode: BackgroundMode
   performance: Performance
   units: Units
   hour12: boolean
@@ -93,8 +88,6 @@ export const ACCENT_SWATCHES = [
 ] as const
 
 export const DEFAULT_SETTINGS: Settings = {
-  layout: 'photo-first',
-  backgroundMode: 'weather',
   performance: 'high',
   units: 'metric',
   hour12: false,
@@ -108,7 +101,7 @@ export const DEFAULT_SETTINGS: Settings = {
   location: null,
   timezone: null,
   preview: 'live',
-  accent: '#7fd0ff',
+  accent: ACCENT_SWATCHES[0],
   greetingName: '',
   showSeconds: false,
   companion: true,

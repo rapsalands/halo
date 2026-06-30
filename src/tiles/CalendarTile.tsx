@@ -73,19 +73,16 @@ export function CalendarTile() {
                 {c.day}
               </span>
               {isHoliday && (
-                <>
-                  <span
-                    style={{
-                      maxWidth: '100%', fontSize: '0.5rem', lineHeight: 1.15, fontWeight: 600,
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden', textAlign: 'center',
-                      color: 'var(--text-dim)',
-                    }}
-                  >
-                    {holidayName}
-                  </span>
-                  <span data-testid="cal-holiday" style={{ display: 'none' }} />
-                </>
+                <span
+                  style={{
+                    maxWidth: '100%', fontSize: '0.5rem', lineHeight: 1.15, fontWeight: 600,
+                    display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden', textAlign: 'center',
+                    color: 'var(--text-dim)',
+                  }}
+                >
+                  {holidayName}
+                </span>
               )}
             </div>
           )

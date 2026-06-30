@@ -21,7 +21,7 @@ describe('CalendarTile', () => {
   })
 
   it('marks a holiday cell once holidays load', async () => {
-    render(<CalendarTile />)
-    await waitFor(() => expect(screen.getByTestId('cal-holiday')).toBeInTheDocument())
+    const { container } = render(<CalendarTile />)
+    await waitFor(() => expect(container.querySelector('[data-holiday="true"]')).toBeInTheDocument())
   })
 })
