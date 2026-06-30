@@ -1,11 +1,11 @@
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { useNowTick } from '../hooks/useNow'
 import { formatClock, formatLongDate, greeting } from '../lib/time'
 
 /** The hero clock floats directly on the sky (no card) — the surrounding space
  *  reads as intentional breathing room rather than an empty box. */
 export function ClockTile() {
-  const now = useAppState((s) => s.now)
   const weatherTz = useAppState((s) => s.weather?.timezone)
   const fallbackTz = useSettings((s) => s.settings.timezone)
   const tz = weatherTz ?? fallbackTz ?? undefined
@@ -13,6 +13,9 @@ export function ClockTile() {
   const hour12 = useSettings((s) => s.settings.hour12)
   const showSeconds = useSettings((s) => s.settings.showSeconds)
   const name = useSettings((s) => s.settings.greetingName)
+  // Only the seconds display needs a per-second tick; otherwise re-render once a
+  // minute (1,440×/day instead of 86,400×).
+  const now = useNowTick(showSeconds)
   const greet = name.trim() ? `${greeting(now, tz)}, ${name.trim()}` : greeting(now, tz)
   return (
     <div

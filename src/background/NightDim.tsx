@@ -1,5 +1,5 @@
-import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { useLocalHour } from '../hooks/useNow'
 import { isDimActive } from '../lib/dim'
 
 /**
@@ -11,9 +11,10 @@ export function NightDim() {
   const enabled = useSettings((s) => s.settings.nightDim)
   const start = useSettings((s) => s.settings.dimStart)
   const end = useSettings((s) => s.settings.dimEnd)
-  const now = useAppState((s) => s.now)
+  // The dim window toggles on hour boundaries; re-render hourly, not per second.
+  const hour = useLocalHour()
 
-  const active = enabled && isDimActive(now.getHours(), start, end)
+  const active = enabled && isDimActive(hour, start, end)
   return (
     <div
       aria-hidden

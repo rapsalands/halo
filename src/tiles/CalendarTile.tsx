@@ -1,8 +1,9 @@
+import { useMemo } from 'react'
 import { TileFrame } from './TileFrame'
-import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { useToday } from '../hooks/useNow'
 import { usePolledData } from '../hooks/usePolledData'
-import { buildMonthGrid, isoOf } from '../lib/calendar'
+import { buildMonthGrid } from '../lib/calendar'
 import { fetchHolidays, type Holiday } from '../services/holidaysService'
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -11,19 +12,18 @@ const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const SIX_H = 6 * 60 * 60_000 // re-poll holidays every 6h
 
 export function CalendarTile() {
-  const now = useAppState((s) => s.now)
+  // Day granularity: the grid and the "today" marker change at most once a day,
+  // so don't re-run buildMonthGrid (42 Date allocations) every second.
+  const { year, month, iso: todayIso } = useToday()
   const country = useSettings((s) => s.settings.holidayCountry)
-  const year = now.getFullYear()
-  const month = now.getMonth()
-  const todayIso = isoOf(now)
-  const grid = buildMonthGrid(year, month)
+  const grid = useMemo(() => buildMonthGrid(year, month), [year, month])
 
   const { data } = usePolledData<Holiday[]>(
     `holidays:${year}:${country}`,
     () => fetchHolidays(year, country),
     SIX_H,
   )
-  const holidays = new Map((data ?? []).map((h) => [h.date, h.name]))
+  const holidays = useMemo(() => new Map((data ?? []).map((h) => [h.date, h.name])), [data])
 
   return (
     <TileFrame justify="flex-start">

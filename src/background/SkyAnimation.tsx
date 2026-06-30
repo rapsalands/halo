@@ -1,5 +1,6 @@
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { useNowTick } from '../hooks/useNow'
 import { resolveScene } from './scene'
 
 /** Scenes where a sun/moon would actually be visible in the sky. */
@@ -75,7 +76,7 @@ function Bird() {
  */
 export function SkyAnimation() {
   const weather = useAppState((s) => s.weather)
-  const now = useAppState((s) => s.now)
+  const now = useNowTick(false) // day/night transitions, not per-second
   const on = useSettings((s) => s.settings.companion)
   const { scene, night } = resolveScene(weather, now)
   if (!on || !SHOW.has(scene)) return null
@@ -96,8 +97,10 @@ export function SkyAnimation() {
       <style>{`
         @keyframes halo-orbit-x { from { transform: translateX(-18vw); } to { transform: translateX(118vw); } }
         @keyframes halo-bob-y { 0%,100% { transform: translateY(2.5vh); } 50% { transform: translateY(-2.5vh); } }
-        .halo-orbit { position: absolute; top: 8vh; left: 0; animation: halo-orbit-x 160s linear infinite; will-change: transform; }
-        .halo-bob { animation: halo-bob-y 18s ease-in-out infinite; will-change: transform; }
+        /* No will-change: these run 24/7 in the common clear/cloudy case, and a
+           permanent compositor-layer hint for each would just pin GPU memory. */
+        .halo-orbit { position: absolute; top: 8vh; left: 0; animation: halo-orbit-x 160s linear infinite; }
+        .halo-bob { animation: halo-bob-y 18s ease-in-out infinite; }
 
         /* occasional bird — crosses in the first ~18s, then off-screen for ~60s */
         @keyframes halo-bird-x {
@@ -106,7 +109,7 @@ export function SkyAnimation() {
           24%  { transform: translate(114vw, -5vh); opacity: 0.75; }
           26%, 100% { transform: translate(114vw, -5vh); opacity: 0; }
         }
-        .halo-bird { position: absolute; top: 23vh; left: 0; animation: halo-bird-x 78s linear infinite; will-change: transform, opacity; }
+        .halo-bird { position: absolute; top: 23vh; left: 0; animation: halo-bird-x 78s linear infinite; }
 
         /* occasional shooting star — a brief streak near the end of each cycle */
         @keyframes halo-shoot-x {
@@ -121,7 +124,7 @@ export function SkyAnimation() {
           background: linear-gradient(270deg, rgba(255,255,255,0.95), rgba(255,255,255,0));
           border-radius: 2px; rotate: 152deg;
           filter: drop-shadow(0 0 4px rgba(200,220,255,0.9));
-          animation: halo-shoot-x 64s linear infinite; will-change: transform, opacity;
+          animation: halo-shoot-x 64s linear infinite;
         }
 
         @media (prefers-reduced-motion: reduce) {

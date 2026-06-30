@@ -4,6 +4,23 @@ const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
 
+// Intl.DateTimeFormat construction is one of the more expensive JS ops, and the
+// clock calls zonedParts up to once a second; cache one formatter per zone so a
+// 24/7 kiosk constructs it once rather than ~259k times/day.
+const fmtCache = new Map<string, Intl.DateTimeFormat>()
+function zonedFormatter(timeZone: string): Intl.DateTimeFormat {
+  let f = fmtCache.get(timeZone)
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      weekday: 'long', month: 'numeric', day: 'numeric',
+    })
+    fmtCache.set(timeZone, f)
+  }
+  return f
+}
+
 /**
  * Calendar/clock parts for `date` in the given IANA `timeZone`. With no timeZone
  * it falls back to the host's local zone (legacy behaviour), so callers without a
@@ -17,11 +34,7 @@ function zonedParts(date: Date, timeZone?: string) {
     }
   }
   try {
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone, hourCycle: 'h23',
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      weekday: 'long', month: 'numeric', day: 'numeric',
-    }).formatToParts(date)
+    const parts = zonedFormatter(timeZone).formatToParts(date)
     const p = Object.fromEntries(parts.map((x) => [x.type, x.value])) as Record<string, string>
     return {
       hour: Number(p.hour) % 24,

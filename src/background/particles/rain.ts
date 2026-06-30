@@ -21,11 +21,12 @@ export function createRain(init: ParticleInit): ParticleSystem {
       ctx.clearRect(0, 0, width, height)
       ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)'
       ctx.lineWidth = 1.2
+      // All drops share one path + one stroke per frame (every drop is the same
+      // colour/width) — thousands of per-drop stroke() calls is the costly part.
+      ctx.beginPath()
       for (const d of drops) {
-        ctx.beginPath()
         ctx.moveTo(d.x, d.y)
         ctx.lineTo(d.x + d.len * slant, d.y + d.len)
-        ctx.stroke()
         d.y += d.speed * sec
         d.x += d.speed * slant * sec
         if (d.y > height || d.x > width + 20) {
@@ -34,6 +35,7 @@ export function createRain(init: ParticleInit): ParticleSystem {
           d.x = Math.random() * (width * 1.3) - width * 0.3
         }
       }
+      ctx.stroke()
     },
   }
 }

@@ -1,5 +1,6 @@
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { useNowTick } from '../hooks/useNow'
 import { resolveScene } from './scene'
 import { ParticleCanvas } from './ParticleCanvas'
 import { Lightning } from './Lightning'
@@ -7,7 +8,7 @@ import { Lightning } from './Lightning'
 /** Full-screen weather effects rendered above the grid (rain/snow/stars + thunder). */
 export function WeatherEffectsOverlay() {
   const weather = useAppState((s) => s.weather)
-  const now = useAppState((s) => s.now)
+  const now = useNowTick(false) // scene granularity, not per-second
   const performance = useSettings((s) => s.settings.performance)
   const { scene } = resolveScene(weather, now)
 

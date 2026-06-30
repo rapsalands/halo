@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useSettings } from '../store/settings'
 import { photoSequence } from '../services/photosService'
 
 const ROTATE_MS = 9000 // visibly cycle the slideshow
@@ -8,7 +9,8 @@ const ROTATE_MS = 9000 // visibly cycle the slideshow
  *  slideshow. Interim source is Picsum so the frame is visibly a slideshow;
  *  Plan 2 swaps this for the iris slideshow driven by the user's own folders. */
 export function PhotoPanel() {
-  const photos = photoSequence(8, 1000, 1500)
+  const photos = useMemo(() => photoSequence(8, 1000, 1500), [])
+  const zoom = useSettings((s) => s.settings.performance) === 'high'
   const [i, setI] = useState(0)
   useEffect(() => {
     const id = setInterval(() => setI((n) => (n + 1) % photos.length), ROTATE_MS)
@@ -29,10 +31,14 @@ export function PhotoPanel() {
           key={photos[i]}
           src={photos[i]}
           alt=""
-          initial={{ opacity: 0, scale: 1.06 }}
+          initial={{ opacity: 0, scale: zoom ? 1.06 : 1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ opacity: { duration: 1.2 }, scale: { duration: ROTATE_MS / 1000, ease: 'linear' } }}
+          transition={{
+            opacity: { duration: 1.2 },
+            // Drop the continuous full-screen zoom on Low performance.
+            ...(zoom ? { scale: { duration: ROTATE_MS / 1000, ease: 'linear' } } : {}),
+          }}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
       </AnimatePresence>

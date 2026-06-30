@@ -1,5 +1,6 @@
 import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
+import { useNowTick } from '../hooks/useNow'
 import { moonPhase } from '../lib/sun'
 import { formatClock } from '../lib/time'
 
@@ -9,7 +10,8 @@ function hhmm(iso: string): string {
 
 export function SunMoonTile() {
   const weather = useAppState((s) => s.weather)
-  const now = useAppState((s) => s.now)
+  // Moon phase shifts over days — minute granularity is ample (and 60× cheaper).
+  const now = useNowTick(false)
 
   if (!weather) {
     return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Sun/Moon unavailable</div></TileFrame>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import type { Scene } from '../lib/weatherCodes'
 import type { Performance } from '../store/defaults'
 import type { ParticleSystem } from './particles/types'
@@ -19,7 +19,9 @@ function makeSystem(scene: Scene, width: number, height: number, performance: Pe
   }
 }
 
-export function ParticleCanvas({ scene, performance }: Props) {
+// Props are primitives (scene/performance), so memo lets the canvas skip the
+// re-render when its parent re-renders for an unrelated reason.
+export const ParticleCanvas = memo(function ParticleCanvas({ scene, performance }: Props) {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -56,4 +58,4 @@ export function ParticleCanvas({ scene, performance }: Props) {
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
     />
   )
-}
+})

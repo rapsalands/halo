@@ -76,9 +76,10 @@ export default function App() {
 
   // Poll weather whenever the location changes, then on an interval.
   const location = useAppState((s) => s.location)
-  const weatherForMood = useAppState((s) => s.weather)
-  const nowForMood = useAppState((s) => s.now)
-  const mood = resolveScene(weatherForMood, nowForMood).accent
+  // Subscribe to the derived mood accent (a string), not the raw per-second
+  // `now`: the root then re-renders only when the scene tint actually changes
+  // (a few times a day) instead of 86,400×/day dragging the whole tree with it.
+  const mood = useAppState((s) => resolveScene(s.weather, s.now).accent)
   useEffect(() => {
     if (!location) return
     let cancelled = false

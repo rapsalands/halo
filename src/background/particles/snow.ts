@@ -19,15 +19,18 @@ export function createSnow(init: ParticleInit): ParticleSystem {
       const sec = dt / 1000
       ctx.clearRect(0, 0, width, height)
       ctx.fillStyle = 'rgba(255,255,255,0.85)'
+      // One path + one fill per frame; every flake is the same colour. moveTo
+      // before each arc so the sub-paths don't join into one connected shape.
+      ctx.beginPath()
       for (const f of flakes) {
         f.phase += sec
         f.y += f.speed * sec
         f.x += Math.sin(f.phase) * f.drift * sec
         if (f.y > height) { f.y = -f.r; f.x = Math.random() * width }
-        ctx.beginPath()
+        ctx.moveTo(f.x + f.r, f.y)
         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2)
-        ctx.fill()
       }
+      ctx.fill()
     },
   }
 }

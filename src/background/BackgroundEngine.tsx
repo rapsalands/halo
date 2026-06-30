@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAppState } from '../store/appState'
+import { useSettings } from '../store/settings'
+import { useNowTick } from '../hooks/useNow'
 import { resolveScene } from './scene'
 import { sceneImages } from './sceneImage'
 import { SkyAnimation } from './SkyAnimation'
@@ -17,13 +19,17 @@ const BG_ROTATE_MS = 75_000
  */
 export function BackgroundEngine() {
   const weather = useAppState((s) => s.weather)
-  const now = useAppState((s) => s.now)
+  // Scene changes a few times a day at most — minute granularity, not per second.
+  const now = useNowTick(false)
+  const performance = useSettings((s) => s.settings.performance)
   const { sky, scene } = resolveScene(weather, now)
-  const images = sceneImages(scene)
-  const [i, setI] = useState(0)
+  const images = useMemo(() => sceneImages(scene), [scene])
 
-  // Restart the rotation whenever the scene's image set changes.
-  useEffect(() => { setI(0) }, [scene])
+  const [i, setI] = useState(0)
+  // Restart the rotation when the scene's image set changes. Done during render
+  // (React's adjust-state-on-change pattern) rather than a setState-in-effect.
+  const [shownScene, setShownScene] = useState(scene)
+  if (scene !== shownScene) { setShownScene(scene); setI(0) }
   useEffect(() => {
     if (images.length <= 1) return
     const id = setInterval(() => setI((n) => (n + 1) % images.length), BG_ROTATE_MS)
@@ -31,6 +37,7 @@ export function BackgroundEngine() {
   }, [images.length, scene])
 
   const src = images[i % images.length]
+  const zoom = performance === 'high'
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
@@ -48,11 +55,13 @@ export function BackgroundEngine() {
           src={src}
           alt=""
           initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 1, scale: 1.09 }}
+          animate={{ opacity: 1, scale: zoom ? 1.09 : 1 }}
           exit={{ opacity: 0 }}
           transition={{
             opacity: { duration: 2.6, ease: 'easeInOut' },
-            scale: { duration: BG_ROTATE_MS / 1000, ease: 'linear' },
+            // Skip the perpetual full-screen Ken-Burns zoom on Low (it forces a
+            // continuous large-layer recomposite); keep just the opacity crossfade.
+            ...(zoom ? { scale: { duration: BG_ROTATE_MS / 1000, ease: 'linear' } } : {}),
           }}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
