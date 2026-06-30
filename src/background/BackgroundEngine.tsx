@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useAppState } from '../store/appState'
 import { resolveScene } from './scene'
 import { sceneImages } from './sceneImage'
-import { SkyCompanion } from './SkyCompanion'
+import { SkyAnimation } from './SkyAnimation'
 
 /** Very slow background rotation — much gentler than the photo frame. */
 const BG_ROTATE_MS = 75_000
@@ -65,7 +65,7 @@ export function BackgroundEngine() {
         }}
       />
       {/* whimsical sun/moon drifting slowly across the sky */}
-      <SkyCompanion />
+      <SkyAnimation />
     </div>
   )
 }

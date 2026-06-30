@@ -16,10 +16,10 @@ const WEATHER_BY_COUNTRY: Record<string, WeatherProvider> = {
 }
 const DEFAULT_WEATHER: WeatherProvider = openWeatherWeather
 
-export function weatherProviderFor(loc: GeoLocation): WeatherProvider {
+export function getWeatherProvider(loc: GeoLocation): WeatherProvider {
   return (loc.countryCode && WEATHER_BY_COUNTRY[loc.countryCode]) || DEFAULT_WEATHER
 }
 
 export function fetchWeather(loc: GeoLocation): Promise<Weather> {
-  return weatherProviderFor(loc).fetchWeather(loc)
+  return getWeatherProvider(loc).fetchWeather(loc)
 }

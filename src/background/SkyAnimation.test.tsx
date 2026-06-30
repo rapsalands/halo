@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { SkyCompanion } from './SkyCompanion'
+import { SkyAnimation } from './SkyAnimation'
 import { useAppState, type Weather } from '../store/appState'
 
 const base: Weather = {
@@ -8,16 +8,16 @@ const base: Weather = {
   sunriseToday: '2026-06-06T05:30', sunsetToday: '2026-06-06T19:30', daily: [], hourly: [], stale: false,
 }
 
-describe('SkyCompanion', () => {
+describe('SkyAnimation', () => {
   it('shows a celestial body on a clear day', () => {
     useAppState.setState({ weather: base, now: new Date('2026-06-06T12:00:00') })
-    const { container } = render(<SkyCompanion />)
+    const { container } = render(<SkyAnimation />)
     expect(container.querySelector('svg')).toBeInTheDocument()
   })
 
   it('renders nothing in the rain (no sun/moon visible)', () => {
     useAppState.setState({ weather: { ...base, code: 63 }, now: new Date('2026-06-06T12:00:00') })
-    const { container } = render(<SkyCompanion />)
+    const { container } = render(<SkyAnimation />)
     expect(container.querySelector('svg')).toBeNull()
   })
 })

@@ -14,8 +14,8 @@ describe('fetchMarkets', () => {
     })) as unknown as typeof fetch)
     const coins = await fetchMarkets(['bitcoin', 'ethereum'])
     expect(coins).toEqual([
-      { id: 'bitcoin', symbol: 'BTC', price: 65000, change24h: 1.5 },
-      { id: 'ethereum', symbol: 'ETH', price: 3200, change24h: -2.1 },
+      { id: 'bitcoin', symbol: 'BITC', price: 65000, change24h: 1.5 },
+      { id: 'ethereum', symbol: 'ETHE', price: 3200, change24h: -2.1 },
     ])
   })
 
@@ -26,7 +26,7 @@ describe('fetchMarkets', () => {
     }))
     vi.stubGlobal('fetch', fetchMock as unknown as typeof fetch)
     const coins = await fetchMarkets(['bitcoin'], 'inr')
-    expect(coins[0]).toEqual({ id: 'bitcoin', symbol: 'BTC', price: 5400000, change24h: 0.8 })
+    expect(coins[0]).toEqual({ id: 'bitcoin', symbol: 'BITC', price: 5400000, change24h: 0.8 })
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('vs_currencies=inr'))
   })
 

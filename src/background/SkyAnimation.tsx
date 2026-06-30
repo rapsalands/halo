@@ -73,7 +73,7 @@ function Bird() {
  * the SVG is static so there is no per-frame paint). Hidden in heavy weather,
  * gated by the "Companion" setting, and stilled by prefers-reduced-motion.
  */
-export function SkyCompanion() {
+export function SkyAnimation() {
   const weather = useAppState((s) => s.weather)
   const now = useAppState((s) => s.now)
   const on = useSettings((s) => s.settings.companion)

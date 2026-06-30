@@ -16,10 +16,10 @@ const AIR_BY_COUNTRY: Record<string, AirQualityProvider> = {
 }
 const DEFAULT_AIR: AirQualityProvider = openWeatherAir
 
-export function airProviderFor(loc: GeoLocation): AirQualityProvider {
+export function getAirQualityProvider(loc: GeoLocation): AirQualityProvider {
   return (loc.countryCode && AIR_BY_COUNTRY[loc.countryCode]) || DEFAULT_AIR
 }
 
 export function fetchAirQuality(loc: GeoLocation): Promise<AirQuality> {
-  return airProviderFor(loc).fetchAirQuality(loc)
+  return getAirQualityProvider(loc).fetchAirQuality(loc)
 }

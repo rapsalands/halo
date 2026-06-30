@@ -15,7 +15,9 @@ const BASE = API.airNow
 interface AirNowObs { ParameterName: string; AQI: number }
 
 export const airNowAir: AirQualityProvider = {
+  
   id: 'airnow',
+  
   async fetchAirQuality(loc: GeoLocation) {
     const url = `${BASE}/aq/observation/latLong/current/?format=application/json`
       + `&latitude=${loc.lat.toFixed(4)}&longitude=${loc.lon.toFixed(4)}&distance=75&API_KEY=${AIRNOW_KEY}`
