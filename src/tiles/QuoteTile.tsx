@@ -3,11 +3,8 @@ import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { useToday } from '../hooks/useNow'
-import { usePolledData } from '../hooks/usePolledData'
+import { useOnThisDay } from '../hooks/useOnThisDay'
 import { pickDailyQuote } from '../lib/quotes'
-import { fetchOnThisDay, type OnThisDay } from '../services/onThisDayService'
-
-const SIX_H = 6 * 60 * 60_000
 
 export function QuoteTile() {
   // The quote and "on this day" entry only change once a day — in the clock's zone.
@@ -16,13 +13,7 @@ export function QuoteTile() {
   const today = useToday(weatherTz ?? fallbackTz ?? undefined)
   const date = useMemo(() => new Date(today.year, today.month, today.day), [today])
   const quote = pickDailyQuote(date)
-  const mm = (today.month + 1).toString().padStart(2, '0')
-  const dd = today.day.toString().padStart(2, '0')
-  const { data: otd } = usePolledData<OnThisDay | null>(
-    `onthisday:${mm}-${dd}`,
-    () => fetchOnThisDay(date),
-    SIX_H,
-  )
+  const { data: otd } = useOnThisDay(date)
 
   return (
     <TileFrame>

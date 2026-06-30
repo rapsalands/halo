@@ -1,4 +1,5 @@
 import { TileFrame } from './TileFrame'
+import { TilePlaceholder } from './TilePlaceholder'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { useNowTick } from '../hooks/useNow'
@@ -16,7 +17,7 @@ export function SunMoonTile() {
   const now = useNowTick(false)
 
   if (!weather) {
-    return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Sun/Moon unavailable</div></TileFrame>
+    return <TilePlaceholder>Sun/Moon unavailable</TilePlaceholder>
   }
   const moon = moonPhase(now)
   // Optional chain on `daily` itself: cached weather from an older app version

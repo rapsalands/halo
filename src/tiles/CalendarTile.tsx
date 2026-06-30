@@ -3,14 +3,11 @@ import { TileFrame } from './TileFrame'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { useToday } from '../hooks/useNow'
-import { usePolledData } from '../hooks/usePolledData'
+import { useHolidays } from '../hooks/useHolidays'
 import { buildMonthGrid } from '../lib/calendar'
-import { fetchHolidays, type Holiday } from '../services/holidaysService'
+import { MONTHS } from '../lib/time'
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December']
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-const SIX_H = 6 * 60 * 60_000 // re-poll holidays every 6h
 
 export function CalendarTile() {
   // Resolve "today" in the same zone the clock uses, so they never disagree on
@@ -23,11 +20,7 @@ export function CalendarTile() {
   const country = useSettings((s) => s.settings.holidayCountry)
   const grid = useMemo(() => buildMonthGrid(year, month), [year, month])
 
-  const { data } = usePolledData<Holiday[]>(
-    `holidays:${year}:${country}`,
-    () => fetchHolidays(year, country),
-    SIX_H,
-  )
+  const { data } = useHolidays(year, country)
   const holidays = useMemo(() => new Map((data ?? []).map((h) => [h.date, h.name])), [data])
 
   return (

@@ -1,22 +1,20 @@
 import { TileFrame } from './TileFrame'
+import { TileLabel } from './TileLabel'
 import { WeatherIcon } from './WeatherIcon'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { weekdayShort } from '../lib/time'
-
-const toF = (c: number) => Math.round((c * 9) / 5 + 32)
+import { tempIn } from '../lib/units'
 
 export function ForecastTile() {
   const weather = useAppState((s) => s.weather)
   const units = useSettings((s) => s.settings.units)
-  const conv = (c: number) => (units === 'imperial' ? toF(c) : c)
+  const conv = (c: number) => tempIn(c, units)
   const daily = weather?.daily ?? []
 
   return (
     <TileFrame style={{ width: '100%', height: '100%' }}>
-      <div style={{ fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 12 }}>
-        7-day outlook
-      </div>
+      <TileLabel style={{ marginBottom: 12 }}>7-day outlook</TileLabel>
       <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between' }}>
         {daily.map((d) => (
           <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.8rem', flex: 1 }}>

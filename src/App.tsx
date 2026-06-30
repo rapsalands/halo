@@ -16,8 +16,7 @@ import { InformationBanner } from './components/InformationBanner'
 import { useNightlyReload } from './hooks/useNightlyReload'
 import { readConfigFromSearch, readLocationFromSearch } from './settings/configIO'
 import { parseDemoName, overrideFor, applyDemo, synthDemoWeather } from './lib/demo'
-
-const WEATHER_INTERVAL = 12 * 60_000 // 12 minutes
+import { POLL } from './lib/intervals'
 
 export default function App() {
   useClock()
@@ -94,7 +93,7 @@ export default function App() {
       }
     }
     poll()
-    const id = setInterval(poll, WEATHER_INTERVAL)
+    const id = setInterval(poll, POLL.weather)
     return () => { cancelled = true; clearInterval(id) }
   }, [location, applyDisplayed])
 

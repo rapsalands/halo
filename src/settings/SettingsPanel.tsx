@@ -11,13 +11,13 @@ import { loadPlaces, searchPlaces } from '../services/placesService'
 import { fetchCountries, type Country } from '../services/holidaysService'
 import { usePolledData } from '../hooks/usePolledData'
 import { fetchWithFallback } from '../lib/fetchWithFallback'
+import { POLL } from '../lib/intervals'
 import { encodeConfig, decodeConfig } from './configIO'
 import './settings.css'
 
 const CURRENCY_OPTS = Object.keys(TICKER_CURRENCIES).map((c) => ({ value: c, label: c.toUpperCase() }))
 const HOURS = Array.from({ length: 24 }, (_, h) => h)
 function hourLabel(h: number): string { return `${h.toString().padStart(2, '0')}:00` }
-const DAY_MS = 24 * 60 * 60_000
 
 /** Shown before Nager's country list loads (and as an offline floor). */
 const FALLBACK_COUNTRIES: Country[] = [
@@ -267,7 +267,7 @@ function CityAutocomplete() {
 function CountrySelect() {
   const holidayCountry = useSettings((s) => s.settings.holidayCountry)
   const update = useSettings((s) => s.update)
-  const { data } = usePolledData<Country[]>('countries', fetchCountries, DAY_MS)
+  const { data } = usePolledData<Country[]>('countries', fetchCountries, POLL.countries)
 
   // Merge the cached list with the offline fallback (and the current value if
   // it isn't in either), deduped by code and sorted by name.
@@ -378,6 +378,17 @@ function AdvancedTab() {
   const settings = useSettings((s) => s.settings)
   const update = useSettings((s) => s.update)
   const [importText, setImportText] = useState('')
+  const [importNote, setImportNote] = useState('')
+
+  function applyImport() {
+    const incoming = decodeConfig(importText)
+    if (!incoming) { setImportNote('Could not read that config'); return }
+    // mergeLayout backfills any tiles missing from the imported (now validated) layout.
+    update(incoming.tileLayout ? { ...incoming, tileLayout: mergeLayout(incoming.tileLayout) } : incoming)
+    setImportText('')
+    setImportNote('Config applied')
+  }
+
   return (
     <>
       <Section title="Live scene">
@@ -429,10 +440,11 @@ function AdvancedTab() {
           />
           <button
             className="set-btn primary block" style={{ marginTop: 8 }}
-            onClick={() => { const c = decodeConfig(importText); if (c) { update(c.tileLayout ? { ...c, tileLayout: mergeLayout(c.tileLayout) } : c); setImportText('') } }}
+            onClick={applyImport}
           >
             Apply imported config
           </button>
+          {importNote && <span className="set-hint">{importNote}</span>}
         </div>
       </Section>
     </>

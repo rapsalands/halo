@@ -1,28 +1,21 @@
 import { TileFrame } from './TileFrame'
+import { TilePlaceholder } from './TilePlaceholder'
+import { TileLabel } from './TileLabel'
 import { useAppState } from '../store/appState'
-import { usePolledData } from '../hooks/usePolledData'
-import { fetchAirQuality, type AirQuality } from '../services/airQualityService'
+import { useAirQuality } from '../hooks/useAirQuality'
 import { aqiCategory } from '../lib/aqi'
-
-const AQI_INTERVAL = 30 * 60_000
 
 export function AirQualityTile() {
   const location = useAppState((s) => s.location)
-  const { data: aq } = usePolledData<AirQuality>(
-    location ? `aqi:${location.lat},${location.lon}` : 'aqi:none',
-    () => fetchAirQuality(location!),
-    AQI_INTERVAL,
-  )
+  const { data: aq, stale } = useAirQuality(location)
 
   if (!aq) {
-    return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Air quality…</div></TileFrame>
+    return <TilePlaceholder>Air quality…</TilePlaceholder>
   }
   const band = aqiCategory(aq.usAqi)
   return (
     <TileFrame style={{ minWidth: 150 }}>
-      <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)' }}>
-        Air quality
-      </div>
+      <TileLabel stale={stale}>Air quality</TileLabel>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
         <span style={{ fontSize: '2.6rem', fontWeight: 800, lineHeight: 1, color: band.color }}>{Math.round(aq.usAqi)}</span>
         <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>US AQI</span>

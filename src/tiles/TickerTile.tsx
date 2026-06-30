@@ -1,9 +1,7 @@
-import { usePolledData } from '../hooks/usePolledData'
+import { TileFrame } from './TileFrame'
 import { useSettings } from '../store/settings'
 import { TICKER_CURRENCIES } from '../store/defaults'
-import { fetchMarkets, type Coin } from '../services/marketsService'
-
-const INTERVAL = 8 * 60_000
+import { useMarkets } from '../hooks/useMarkets'
 
 function fmtPrice(n: number, sym: string): string {
   if (!Number.isFinite(n)) return '—' // upstream may omit a coin's price in this fiat
@@ -14,17 +12,10 @@ export function TickerTile() {
   const coinsCfg = useSettings((s) => s.settings.tickerCoins)
   const currency = useSettings((s) => s.settings.tickerCurrency)
   const sym = TICKER_CURRENCIES[currency] ?? ''
-  const { data } = usePolledData<Coin[]>(
-    `markets:${currency}:${coinsCfg.join(',')}`,
-    () => fetchMarkets(coinsCfg, currency),
-    INTERVAL,
-  )
+  const { data, stale } = useMarkets(coinsCfg, currency)
   const coins = data ?? []
   return (
-    <div
-      className="glass"
-      style={{ display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'center', padding: '0.55rem 1.6rem', overflow: 'hidden', whiteSpace: 'nowrap' }}
-    >
+    <TileFrame justify="flex-start" style={{ flexDirection: 'row', gap: '2rem', alignItems: 'center', padding: '0.55rem 1.6rem', overflow: 'hidden', whiteSpace: 'nowrap' }}>
       {coins.map((c) => {
         const up = c.change24h >= 0
         return (
@@ -38,6 +29,9 @@ export function TickerTile() {
         )
       })}
       {coins.length === 0 && <span style={{ color: 'var(--text-dim)' }}>Markets loading…</span>}
-    </div>
+      {stale && coins.length > 0 && (
+        <span title="Showing last known prices" style={{ color: '#ffd27e', fontSize: '0.85rem' }}>· stale</span>
+      )}
+    </TileFrame>
   )
 }

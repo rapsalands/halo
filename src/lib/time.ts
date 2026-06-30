@@ -10,6 +10,11 @@ function isoYmd(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
+/** "MM-DD" for a date (host-local) — the key for day-of-year data sets. */
+export function monthDayKey(date: Date): string {
+  return `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
 /** Short weekday name for a date-only string, read as a LOCAL calendar date.
  *  Parsing the components avoids the UTC-midnight shift that `new Date(str)`
  *  causes (which mislabels every day for hosts west of UTC). */

@@ -1,21 +1,21 @@
 import { TileFrame } from './TileFrame'
+import { TilePlaceholder } from './TilePlaceholder'
 import { WeatherIcon } from './WeatherIcon'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { describeCode } from '../lib/weatherCodes'
 import { isDaylightAtClock } from '../lib/sun'
 import { formatClock } from '../lib/time'
-
-const toF = (c: number) => Math.round((c * 9) / 5 + 32)
+import { tempIn } from '../lib/units'
 
 export function WeatherTile() {
   const weather = useAppState((s) => s.weather)
   const units = useSettings((s) => s.settings.units)
   const hour12 = useSettings((s) => s.settings.hour12)
   if (!weather) {
-    return <TileFrame><div style={{ color: 'var(--text-dim)' }}>Weather unavailable</div></TileFrame>
+    return <TilePlaceholder>Weather unavailable</TilePlaceholder>
   }
-  const conv = (c: number) => (units === 'imperial' ? toF(c) : c)
+  const conv = (c: number) => tempIn(c, units)
   const { label } = describeCode(weather.code)
   // Defensive: cached weather from an older app version may lack these arrays.
   const daily = weather.daily ?? []
