@@ -36,4 +36,10 @@ describe('ForecastTile', () => {
     const { container } = render(<ForecastTile />)
     expect(container.querySelector('[data-testid="forecast-day"]')).toBeNull()
   })
+
+  it('labels each day with its local weekday', () => {
+    render(<ForecastTile />)
+    expect(screen.getByText('Sat')).toBeInTheDocument() // 2026-06-06
+    expect(screen.getByText('Sun')).toBeInTheDocument() // 2026-06-07
+  })
 })

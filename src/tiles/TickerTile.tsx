@@ -6,6 +6,7 @@ import { fetchMarkets, type Coin } from '../services/marketsService'
 const INTERVAL = 8 * 60_000
 
 function fmtPrice(n: number, sym: string): string {
+  if (!Number.isFinite(n)) return '—' // upstream may omit a coin's price in this fiat
   return n >= 1000 ? `${sym}${Math.round(n).toLocaleString()}` : `${sym}${n.toFixed(2)}`
 }
 

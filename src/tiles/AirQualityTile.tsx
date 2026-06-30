@@ -29,7 +29,7 @@ export function AirQualityTile() {
       </div>
       <div style={{ marginTop: 8, fontWeight: 600, color: band.color }}>{band.label}</div>
       <div style={{ height: 6, borderRadius: 3, marginTop: 8, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
-        <div style={{ width: `${Math.min(100, (aq.usAqi / 300) * 100)}%`, height: '100%', background: band.color, transition: 'width 0.6s ease' }} />
+        <div style={{ width: `${Math.min(100, (aq.usAqi / 500) * 100)}%`, height: '100%', background: band.color, transition: 'width 0.6s ease' }} />
       </div>
       <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: 8 }}>PM2.5 {Math.round(aq.pm25)} µg/m³</div>
     </TileFrame>

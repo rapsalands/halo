@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { TileFrame } from './TileFrame'
+import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { useToday } from '../hooks/useNow'
 import { usePolledData } from '../hooks/usePolledData'
@@ -12,9 +13,13 @@ const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const SIX_H = 6 * 60 * 60_000 // re-poll holidays every 6h
 
 export function CalendarTile() {
+  // Resolve "today" in the same zone the clock uses, so they never disagree on
+  // the date around midnight when the host zone differs from the location.
+  const weatherTz = useAppState((s) => s.weather?.timezone)
+  const fallbackTz = useSettings((s) => s.settings.timezone)
   // Day granularity: the grid and the "today" marker change at most once a day,
   // so don't re-run buildMonthGrid (42 Date allocations) every second.
-  const { year, month, iso: todayIso } = useToday()
+  const { year, month, iso: todayIso } = useToday(weatherTz ?? fallbackTz ?? undefined)
   const country = useSettings((s) => s.settings.holidayCountry)
   const grid = useMemo(() => buildMonthGrid(year, month), [year, month])
 

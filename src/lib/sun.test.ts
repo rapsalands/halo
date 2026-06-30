@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { moonPhase, isDaytime, sunTimes } from './sun'
+import { moonPhase, isDaytime, isDaylightAtClock, sunTimes } from './sun'
 
 describe('sunTimes', () => {
   const hours = (a: Date, b: Date) => (b.getTime() - a.getTime()) / 3_600_000
@@ -52,5 +52,21 @@ describe('isDaytime', () => {
     expect(isDaytime(new Date('2026-06-06T12:00:00Z'), sunrise, sunset)).toBe(true)
     expect(isDaytime(new Date('2026-06-06T22:00:00Z'), sunrise, sunset)).toBe(false)
     expect(isDaytime(new Date('2026-06-06T03:00:00Z'), sunrise, sunset)).toBe(false)
+  })
+})
+
+describe('isDaylightAtClock', () => {
+  const sunrise = new Date('2026-06-06T05:30:00')
+  const sunset = new Date('2026-06-06T19:30:00')
+  it('is day between sunrise and sunset', () => {
+    expect(isDaylightAtClock(new Date('2026-06-06T12:00:00'), sunrise, sunset)).toBe(true)
+  })
+  it('is night after sunset and before sunrise', () => {
+    expect(isDaylightAtClock(new Date('2026-06-06T21:00:00'), sunrise, sunset)).toBe(false)
+    expect(isDaylightAtClock(new Date('2026-06-06T03:00:00'), sunrise, sunset)).toBe(false)
+  })
+  it('reads a next-day morning hour as day by time-of-day, not absolute instant', () => {
+    // 08:00 the following day must be daytime even though it is after *today's* sunset.
+    expect(isDaylightAtClock(new Date('2026-06-07T08:00:00'), sunrise, sunset)).toBe(true)
   })
 })

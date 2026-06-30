@@ -1,8 +1,40 @@
 export type DayPart = 'dawn' | 'day' | 'dusk' | 'night'
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+export const WEEKDAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
+
+/** YYYY-MM-DD for the given year / 0-indexed month / day. */
+function isoYmd(year: number, month: number, day: number): string {
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+/** Short weekday name for a date-only string, read as a LOCAL calendar date.
+ *  Parsing the components avoids the UTC-midnight shift that `new Date(str)`
+ *  causes (which mislabels every day for hosts west of UTC). */
+export function weekdayShort(isoDate: string): string {
+  const [y, m, d] = isoDate.split('-').map(Number)
+  return WEEKDAYS_SHORT[new Date(y, m - 1, d).getDay()]
+}
+
+/** The calendar date (year / 0-indexed month / day) of `date` in the given IANA
+ *  zone — or host-local with no zone. Lets the calendar/quote agree with the
+ *  clock on which day it is when the host zone differs from the location. */
+export function zonedYmd(date: Date, timeZone?: string): { year: number; month: number; day: number; iso: string } {
+  if (timeZone) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+      }).formatToParts(date)
+      const p = Object.fromEntries(parts.map((x) => [x.type, x.value])) as Record<string, string>
+      const year = Number(p.year), month = Number(p.month) - 1, day = Number(p.day)
+      return { year, month, day, iso: isoYmd(year, month, day) }
+    } catch { /* unknown zone — fall through to host-local */ }
+  }
+  const year = date.getFullYear(), month = date.getMonth(), day = date.getDate()
+  return { year, month, day, iso: isoYmd(year, month, day) }
+}
 
 // Intl.DateTimeFormat construction is one of the more expensive JS ops, and the
 // clock calls zonedParts up to once a second; cache one formatter per zone so a

@@ -38,4 +38,19 @@ describe('WeatherTile', () => {
     render(<WeatherTile />)
     expect(screen.getByText(/weather unavailable/i)).toBeInTheDocument()
   })
+
+  it('renders an hourly cell per hour (icons derive day/night from the sun times)', () => {
+    useAppState.setState({
+      weather: {
+        ...W,
+        hourly: [
+          { time: '2026-06-06T13:00', temp: 25, code: 0 }, // daytime
+          { time: '2026-06-06T22:00', temp: 19, code: 0 }, // after sunset → night
+        ],
+      },
+    })
+    render(<WeatherTile />)
+    expect(screen.getByText('13:00')).toBeInTheDocument()
+    expect(screen.getByText('22:00')).toBeInTheDocument()
+  })
 })

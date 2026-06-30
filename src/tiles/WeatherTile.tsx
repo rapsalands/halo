@@ -3,6 +3,7 @@ import { WeatherIcon } from './WeatherIcon'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { describeCode } from '../lib/weatherCodes'
+import { isDaylightAtClock } from '../lib/sun'
 import { formatClock } from '../lib/time'
 
 const toF = (c: number) => Math.round((c * 9) / 5 + 32)
@@ -20,6 +21,13 @@ export function WeatherTile() {
   const daily = weather.daily ?? []
   const today = daily[0]
   const hours = (weather.hourly ?? []).slice(0, 8)
+  // The hourly feed has no is_day flag; derive each cell's day/night from the
+  // sun times by time-of-day (so e.g. an 11 PM cell shows the moon, not the sun).
+  const sunrise = new Date(weather.sunriseToday)
+  const sunset = new Date(weather.sunsetToday)
+  const sunValid = !Number.isNaN(sunrise.getTime()) && !Number.isNaN(sunset.getTime())
+  const hourIsDay = (iso: string) =>
+    sunValid ? isDaylightAtClock(new Date(iso), sunrise, sunset) : weather.isDay
 
   return (
     <TileFrame justify="space-between" style={{ minWidth: 320 }}>
@@ -46,7 +54,7 @@ export function WeatherTile() {
           {hours.map((h) => (
             <div key={h.time} style={{ flex: 1, textAlign: 'center', fontSize: '0.72rem' }}>
               <div style={{ color: 'var(--text-dim)' }}>{formatClock(new Date(h.time), hour12)}</div>
-              <WeatherIcon code={h.code} isDay={weather.isDay} size={24} />
+              <WeatherIcon code={h.code} isDay={hourIsDay(h.time)} size={24} />
               <div style={{ fontWeight: 600 }}>{conv(h.temp)}°</div>
             </div>
           ))}

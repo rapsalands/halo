@@ -2,13 +2,9 @@ import { TileFrame } from './TileFrame'
 import { WeatherIcon } from './WeatherIcon'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
+import { weekdayShort } from '../lib/time'
 
 const toF = (c: number) => Math.round((c * 9) / 5 + 32)
-
-function weekday(dateStr: string): string {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  return days[new Date(dateStr).getDay()]
-}
 
 export function ForecastTile() {
   const weather = useAppState((s) => s.weather)
@@ -24,7 +20,7 @@ export function ForecastTile() {
       <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between' }}>
         {daily.map((d) => (
           <div key={d.date} data-testid="forecast-day" style={{ textAlign: 'center', fontSize: '0.8rem', flex: 1 }}>
-            <div style={{ color: 'var(--text-dim)' }}>{weekday(d.date)}</div>
+            <div style={{ color: 'var(--text-dim)' }}>{weekdayShort(d.date)}</div>
             <WeatherIcon code={d.code} isDay={true} size={28} />
             <div style={{ fontWeight: 600 }}>{conv(d.tempMax)}°</div>
             <div style={{ color: 'var(--text-dim)' }}>{conv(d.tempMin)}°</div>

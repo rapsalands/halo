@@ -38,6 +38,17 @@ export function isDaytime(now: Date, sunrise: Date, sunset: Date): boolean {
   return now >= sunrise && now < sunset
 }
 
+/**
+ * Day vs night for a wall-clock instant compared by *time-of-day* rather than
+ * absolute instant. Used for the hourly strip, where the cells can run past
+ * midnight: an absolute compare to *today's* sunset would wrongly read the next
+ * morning's hours as night.
+ */
+export function isDaylightAtClock(t: Date, sunrise: Date, sunset: Date): boolean {
+  const minutes = (d: Date) => d.getHours() * 60 + d.getMinutes()
+  return minutes(t) >= minutes(sunrise) && minutes(t) < minutes(sunset)
+}
+
 const RAD = Math.PI / 180
 
 /**

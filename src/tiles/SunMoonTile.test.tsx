@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { SunMoonTile } from './SunMoonTile'
 import { useAppState, type Weather } from '../store/appState'
+import { useSettings } from '../store/settings'
 
 const W: Weather = {
   code: 0, isDay: true, temp: 22, feelsLike: 22, humidity: 30, windSpeed: 5,
@@ -14,6 +15,7 @@ const W: Weather = {
 describe('SunMoonTile', () => {
   beforeEach(() => {
     localStorage.clear()
+    useSettings.getState().reset()
     useAppState.setState({ weather: W, now: new Date('2026-06-06T12:00:00'), location: { lat: 1, lon: 2, name: 'x' } })
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ current: { us_aqi: 42, pm2_5: 9 } }) })) as unknown as typeof fetch)
   })
@@ -35,5 +37,17 @@ describe('SunMoonTile', () => {
     useAppState.setState({ weather: null })
     render(<SunMoonTile />)
     expect(screen.getByText(/unavailable/i)).toBeInTheDocument()
+  })
+
+  it('does not crash when cached weather lacks the daily array', () => {
+    useAppState.setState({ weather: { ...W, daily: undefined } as unknown as Weather })
+    expect(() => render(<SunMoonTile />)).not.toThrow()
+  })
+
+  it('honours the 12-hour clock setting for sunrise and sunset', () => {
+    useSettings.getState().update({ hour12: true })
+    render(<SunMoonTile />)
+    expect(screen.getByText('5:30 AM')).toBeInTheDocument()
+    expect(screen.getByText('7:30 PM')).toBeInTheDocument()
   })
 })

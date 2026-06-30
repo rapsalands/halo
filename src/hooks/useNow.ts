@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useAppState } from '../store/appState'
-import { isoOf } from '../lib/calendar'
+import { zonedYmd } from '../lib/time'
 
 /**
  * The shared clock, coarsened so a component re-renders only at the granularity
@@ -21,9 +21,13 @@ export function useLocalHour(): number {
   return useAppState((s) => s.now.getHours())
 }
 
-/** Today's local date parts; re-renders only when the local day rolls over. */
-export function useToday(): { year: number; month: number; day: number; iso: string } {
-  const iso = useAppState((s) => isoOf(s.now))
+/**
+ * Today's date parts in `timeZone` (host-local if omitted); re-renders only when
+ * that day rolls over. Pass the same zone the clock uses so the calendar/quote
+ * agree with it on which day it is when the host zone differs from the location.
+ */
+export function useToday(timeZone?: string): { year: number; month: number; day: number; iso: string } {
+  const iso = useAppState((s) => zonedYmd(s.now, timeZone).iso)
   return useMemo(() => {
     const [year, month, day] = iso.split('-').map(Number)
     return { year, month: month - 1, day, iso }
