@@ -1,4 +1,5 @@
 import type { Settings } from '../store/defaults'
+import { sanitizeSettings } from '../store/sanitizeSettings'
 
 export function encodeConfig(settings: Settings): string {
   return btoa(unescape(encodeURIComponent(JSON.stringify(settings))))
@@ -7,9 +8,9 @@ export function encodeConfig(settings: Settings): string {
 export function decodeConfig(blob: string): Partial<Settings> | null {
   try {
     const json = decodeURIComponent(escape(atob(blob)))
-    const parsed = JSON.parse(json)
-    if (parsed && typeof parsed === 'object') return parsed as Partial<Settings>
-    return null
+    // Never trust the decoded shape: validate every field and drop anything
+    // unknown/ill-typed so a hostile or stale `?config=` cannot poison state.
+    return sanitizeSettings(JSON.parse(json))
   } catch {
     return null
   }
@@ -40,6 +41,9 @@ export function readLocationFromSearch(search: string): Partial<Settings> | null
   const lat = Number(latRaw)
   const lon = Number(lonRaw)
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
-  const name = (p.get('place') || p.get('loc') || 'Configured location').trim()
+  // Reject impossible coordinates so a malformed hand-off can't drive the weather
+  // feed to a garbage point; cap the label so it can't blow up the clock tile.
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null
+  const name = (p.get('place') || p.get('loc') || 'Configured location').trim().slice(0, 60)
   return { location: { lat, lon, name } }
 }

@@ -11,6 +11,9 @@ export type TileId = RegionId
 
 export interface LayoutItem { i: RegionId; x: number; y: number; w: number; h: number }
 
+/** A pinned location (null = auto-detect via IP). */
+export interface GeoLocationSetting { lat: number; lon: number; name: string; countryCode?: string }
+
 export const GRID_COLS = 12
 export const GRID_ROWS = 18
 
@@ -55,7 +58,7 @@ export interface Settings {
   tileLayout: LayoutItem[]
   /** Schema version of tileLayout; mismatched persisted layouts are reset. */
   layoutVersion: number
-  location: { lat: number; lon: number; name: string; countryCode?: string } | null // null = auto-detect
+  location: GeoLocationSetting | null // null = auto-detect
   /** IANA timezone fallback for the clock when there is no weather feed (offline).
    *  The kiosk injects it via ?config=. Does NOT disable IP auto-detect. */
   timezone: string | null

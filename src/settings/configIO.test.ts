@@ -38,4 +38,36 @@ describe('configIO', () => {
     expect(readLocationFromSearch('?lat=abc&lon=2')).toBeNull()
     expect(readLocationFromSearch('?foo=bar')).toBeNull()
   })
+
+  // --- S1/S2: imported config is sanitized, not trusted verbatim ---
+  const encodeRaw = (obj: unknown) =>
+    btoa(unescape(encodeURIComponent(JSON.stringify(obj))))
+
+  it('strips an unsafe accent from an imported config (no CSS injection)', () => {
+    const blob = encodeRaw({ accent: 'url(https://evil.example/ping)', hour12: true })
+    expect(decodeConfig(blob)).toEqual({ hour12: true })
+  })
+
+  it('drops unknown keys from an imported config', () => {
+    const blob = encodeRaw({ evil: 1, units: 'imperial' })
+    expect(decodeConfig(blob)).toEqual({ units: 'imperial' })
+  })
+
+  it('drops a non-array tileLayout that would otherwise crash the grid', () => {
+    const blob = encodeRaw({ tileLayout: 'garbage', hour12: true })
+    expect(decodeConfig(blob)).toEqual({ hour12: true })
+  })
+
+  // --- S3: location query params are range/length checked ---
+  it('rejects out-of-range coordinates', () => {
+    expect(readLocationFromSearch('?lat=200&lon=0')).toBeNull()
+    expect(readLocationFromSearch('?lat=0&lon=999')).toBeNull()
+    expect(readLocationFromSearch('?lat=-91&lon=0')).toBeNull()
+  })
+
+  it('caps an overly long place label', () => {
+    const long = 'x'.repeat(500)
+    const name = readLocationFromSearch(`?lat=1&lon=2&place=${long}`)?.location?.name ?? ''
+    expect(name.length).toBeLessThanOrEqual(60)
+  })
 })

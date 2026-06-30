@@ -60,4 +60,24 @@ describe('settings store', () => {
     // must be a distinct array reference so mutations cannot leak into the shared constant
     expect(layout).not.toBe(DEFAULT_LAYOUT)
   })
+
+  // --- S1: a corrupt/hostile persisted blob must not crash boot ---
+  it('survives a corrupt persisted tileLayout without crashing', () => {
+    localStorage.setItem('halo:settings', JSON.stringify({
+      value: { layoutVersion: LAYOUT_VERSION, tileLayout: 'garbage', hour12: true },
+      ts: 1,
+    }))
+    expect(() => useSettings.getState().load()).not.toThrow()
+    const s = useSettings.getState().settings
+    expect(s.hour12).toBe(true) // valid fields still applied
+    expect(s.tileLayout).toEqual(DEFAULT_LAYOUT) // garbage layout dropped → default
+  })
+
+  it('drops an unsafe persisted accent on load', () => {
+    localStorage.setItem('halo:settings', JSON.stringify({
+      value: { accent: 'url(https://evil.example/ping)' }, ts: 1,
+    }))
+    useSettings.getState().load()
+    expect(useSettings.getState().settings.accent).toBe(DEFAULT_SETTINGS.accent)
+  })
 })

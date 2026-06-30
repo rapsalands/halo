@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { DEFAULT_SETTINGS, DEFAULT_LAYOUT, LAYOUT_VERSION, type Settings, type LayoutItem } from './defaults'
 import { saveCache, loadCache } from '../lib/storage'
+import { sanitizeSettings } from './sanitizeSettings'
 
 const KEY = 'settings'
 
@@ -21,22 +22,29 @@ interface SettingsState {
 export const useSettings = create<SettingsState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   load: () => {
-    const cached = loadCache<Partial<Settings>>(KEY)
-    if (cached) {
+    try {
+      const cached = loadCache<Partial<Settings>>(KEY)
+      if (!cached) return
+      // Never trust persisted bytes: a corrupt or tampered blob (incl. one a
+      // hostile `?config=` wrote earlier) is validated field-by-field, so a
+      // bad shape can't crash boot on this 24/7 kiosk.
+      const clean = sanitizeSettings(cached.value)
       // A layout saved under an older grid (different GRID_ROWS/DEFAULT_LAYOUT)
       // would render mis-sized, so discard it and adopt the current default.
-      const layoutCompatible = cached.value.layoutVersion === LAYOUT_VERSION
+      const layoutCompatible = clean.layoutVersion === LAYOUT_VERSION
       set({
         settings: {
           ...DEFAULT_SETTINGS,
-          ...cached.value,
+          ...clean,
           // Deep-merge tiles so newly-added tiles inherit their default rather
           // than being absent (and therefore hidden) for existing screens.
-          enabledTiles: { ...DEFAULT_SETTINGS.enabledTiles, ...cached.value.enabledTiles },
-          tileLayout: layoutCompatible ? mergeLayout(cached.value.tileLayout) : [...DEFAULT_LAYOUT],
+          enabledTiles: { ...DEFAULT_SETTINGS.enabledTiles, ...clean.enabledTiles },
+          tileLayout: layoutCompatible ? mergeLayout(clean.tileLayout) : [...DEFAULT_LAYOUT],
           layoutVersion: LAYOUT_VERSION,
         },
       })
+    } catch {
+      /* unreadable/corrupt store — keep the in-memory defaults so the app boots */
     }
   },
   update: (patch) => {
