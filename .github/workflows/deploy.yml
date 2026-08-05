@@ -31,7 +31,7 @@ jobs:
       # Publish a SELF-CONTAINED product artifact for KioskOS's generic product
       # installer: dist/ + product.yaml (self-description) + product-owned systemd
       # units + the self-updater. KioskOS reads product.yaml and wires the device
-      # generically — it has no Halo-specific code. Rolling release, replaced each push.
+      # generically — it has no Halo-specific code.
       - name: Publish offline bundle (halo-dist.tar.gz)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,9 +42,23 @@ jobs:
              device/halo-update.service device/halo-update.timer pkg/
           chmod +x pkg/halo-update.sh
           tar -czf halo-dist.tar.gz -C pkg .
+
+          # Immutable release, one per commit: the pin a consumer builds against
+          # (kiosk-system's registered-product bake, kiosk-system#120) needs a
+          # tag that never moves once published, unlike dist-latest below.
+          version_tag="build-${GITHUB_SHA::7}"
+          gh release create "$version_tag" \
+            --title "Halo $version_tag" \
+            --notes "Immutable product bundle built from $GITHUB_SHA. Never overwritten — a consumer pins to this tag and the sha256 it reports."
+          gh release upload "$version_tag" halo-dist.tar.gz
+          echo "product bundle sha256: $(sha256sum halo-dist.tar.gz | cut -d' ' -f1)"
+
+          # Rolling release for Halo's own self-updater (device/halo-update.sh),
+          # which always wants the newest bundle regardless of what any
+          # consumer has pinned.
           gh release create dist-latest \
             --title "Latest kiosk offline bundle" \
-            --notes "Rolling product bundle (dist/ + product.yaml + units + self-updater) for KioskOS offline bundling. Auto-updated on each push to main." \
+            --notes "Rolling product bundle (dist/ + product.yaml + units + self-updater), auto-updated on each push to main. KioskOS's build-time bake does not use this — see the build-<sha> release above." \
             || true
           gh release upload dist-latest halo-dist.tar.gz --clobber
 
