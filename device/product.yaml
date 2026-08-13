@@ -9,7 +9,7 @@ name: Halo
 # KioskOS reads it from this manifest (it hardcodes no product copy). Required by
 # the OS bake-time manifest gate — a missing description fails the build rather
 # than surfacing as a blank line in the UI (kiosk-system #75).
-description: "A login-free, weather-reactive wall dashboard whose scene adapts to live weather and the time of day."
+description: "A login-free, weather-reactive wall dashboard."
 # The loopback URL the OS sets as the content surface's default and probes for
 # readiness. Served by halo.service (below) — never exposed on the network.
 url: "http://127.0.0.1:8090/"
