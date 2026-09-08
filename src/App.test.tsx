@@ -14,6 +14,9 @@ describe('App', () => {
 
   it('mounts the background and layout without crashing', () => {
     const { container } = render(<App />)
-    expect(container.querySelector('canvas')).toBeInTheDocument()
+    // The tile grid is the stable mount marker. The particle canvas is not: it
+    // only exists for scenes that actually draw particles, and this smoke test
+    // has no network, so there is no weather and no such scene.
+    expect(container.querySelector('.tile-grid')).toBeInTheDocument()
   })
 })

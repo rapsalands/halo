@@ -1,0 +1,24 @@
+/* Weather-icon motion.
+ *
+ * Defined once here rather than injected per <svg>. The icon renders up to 13
+ * times on a full dashboard (current conditions + 5 hourly + 7-day forecast),
+ * and each instance used to ship its own identical copy of these keyframes.
+ *
+ * Motion is opt-in via `animated` (see WeatherIcon) because every perpetual
+ * animation keeps the compositor at full frame rate for as long as it runs —
+ * thirteen 24px spinning suns cost as much as the full-screen background. */
+
+@keyframes wi-spin { to { transform: rotate(360deg); } }
+@keyframes wi-drop { 0% { transform: translateY(-2px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+@keyframes wi-flake { 0% { transform: translateY(-2px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(11px); opacity: 0; } }
+@keyframes wi-flash { 0%, 92%, 100% { opacity: 0.25; } 94%, 98% { opacity: 1; } }
+
+.wi-rays { transform-origin: 22px 22px; animation: wi-spin 30s linear infinite; }
+.wi-raindrop { animation: wi-drop 1.1s linear infinite; }
+.wi-snowflake { animation: wi-flake 1.6s linear infinite; }
+.wi-bolt { animation: wi-flash 3s ease-in-out infinite; }
+
+/* The kiosk asks for reduced motion to stand the whole dashboard still. */
+@media (prefers-reduced-motion: reduce) {
+  .wi-rays, .wi-raindrop, .wi-snowflake, .wi-bolt { animation: none; }
+}

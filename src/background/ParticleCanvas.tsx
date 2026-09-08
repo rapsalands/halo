@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef } from 'react'
+import { useReducedMotion } from 'framer-motion'
 import type { Scene } from '../lib/weatherCodes'
 import type { Performance } from '../store/defaults'
 import type { ParticleSystem } from './particles/types'
@@ -7,6 +8,12 @@ import { createSnow } from './particles/snow'
 import { createStars } from './particles/stars'
 
 interface Props { scene: Scene; performance: Performance }
+
+/** Which scenes actually draw particles. Kept beside `makeSystem` and in step
+ *  with it, so the component can decide whether to mount a canvas at all. */
+function hasParticles(scene: Scene): boolean {
+  return scene === 'rain' || scene === 'thunder' || scene === 'snow' || scene === 'clear-night'
+}
 
 function makeSystem(scene: Scene, width: number, height: number, performance: Performance): ParticleSystem | null {
   const init = { width, height, performance }
@@ -23,10 +30,15 @@ function makeSystem(scene: Scene, width: number, height: number, performance: Pe
 // re-render when its parent re-renders for an unrelated reason.
 export const ParticleCanvas = memo(function ParticleCanvas({ scene, performance }: Props) {
   const ref = useRef<HTMLCanvasElement>(null)
+  const reduceMotion = useReducedMotion()
+  // Two reasons not to draw: the viewer asked for stillness, or this scene has
+  // no particles. In the second case the canvas used to mount anyway — a
+  // full-screen compositing layer that never drew anything.
+  const active = hasParticles(scene) && !reduceMotion
 
   useEffect(() => {
     const canvas = ref.current
-    if (!canvas) return
+    if (!canvas || !active) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     const width = (canvas.width = window.innerWidth)
@@ -50,7 +62,9 @@ export const ParticleCanvas = memo(function ParticleCanvas({ scene, performance 
     }
     loop()
     return () => cancelAnimationFrame(raf)
-  }, [scene, performance])
+  }, [scene, performance, active])
+
+  if (!active) return null
 
   return (
     <canvas

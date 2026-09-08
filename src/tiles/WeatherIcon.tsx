@@ -1,6 +1,15 @@
 import { describeCode } from '../lib/weatherCodes'
+import './weatherIcon.css'
 
-interface Props { code: number; isDay: boolean; size?: number }
+interface Props {
+  code: number
+  isDay: boolean
+  size?: number
+  /** Animate the icon. Off by default: a dashboard shows many of these at once
+   *  and each perpetual animation holds the compositor at full frame rate, so
+   *  only the current-conditions icon earns the cost. */
+  animated?: boolean
+}
 
 type IconKind = 'sun' | 'moon' | 'partly-day' | 'partly-night' | 'cloud' | 'rain' | 'snow' | 'thunder' | 'fog'
 
@@ -24,24 +33,17 @@ const SUN = '#ffd86b'
 const CLOUD = '#e6ecf5'
 const CLOUD_DARK = '#b9c4d6'
 
-/** Animated SVG weather icon. Uses scoped CSS keyframes for subtle motion. */
-export function WeatherIcon({ code, isDay, size = 64 }: Props) {
+/** SVG weather icon. Motion is opt-in — see `animated` — and keyframes live in
+ *  weatherIcon.css so the thirteen icons on a dashboard share one definition. */
+export function WeatherIcon({ code, isDay, size = 64, animated = false }: Props) {
   const kind = kindFor(code, isDay)
-  const id = `wi-${kind}`
+  const cls = (name: string) => (animated ? name : undefined)
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ overflow: 'visible' }}>
-      <style>{`
-        @keyframes ${id}-spin { to { transform: rotate(360deg); } }
-        @keyframes ${id}-drop { 0% { transform: translateY(-2px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
-        @keyframes ${id}-flake { 0% { transform: translateY(-2px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(11px); opacity: 0; } }
-        @keyframes ${id}-flash { 0%, 92%, 100% { opacity: 0.25; } 94%, 98% { opacity: 1; } }
-        .${id}-rays { transform-origin: 22px 22px; animation: ${id}-spin 30s linear infinite; }
-      `}</style>
-
       {(kind === 'sun' || kind === 'partly-day') && (
         <g>
           {kind === 'sun' && (
-            <g className={`${id}-rays`} stroke={SUN} strokeWidth="2.4" strokeLinecap="round">
+            <g className={cls('wi-rays')} stroke={SUN} strokeWidth="2.4" strokeLinecap="round">
               {Array.from({ length: 8 }, (_, i) => {
                 const a = (i * Math.PI) / 4
                 return <line key={i} x1={22 + Math.cos(a) * 15} y1={22 + Math.sin(a) * 15}
@@ -69,7 +71,7 @@ export function WeatherIcon({ code, isDay, size = 64 }: Props) {
         <g stroke="#7fb3e6" strokeWidth="2.6" strokeLinecap="round">
           {[20, 30, 40].map((x, i) => (
             <line key={x} x1={x} y1="50" x2={x} y2="54"
-              style={{ animation: `${id}-drop 1.1s linear ${i * 0.25}s infinite` }} />
+              className={cls('wi-raindrop')} style={{ animationDelay: `${i * 0.25}s` }} />
           ))}
         </g>
       )}
@@ -78,14 +80,14 @@ export function WeatherIcon({ code, isDay, size = 64 }: Props) {
         <g fill="#ffffff">
           {[20, 30, 40].map((x, i) => (
             <circle key={x} cx={x} cy="52" r="2"
-              style={{ animation: `${id}-flake 1.6s linear ${i * 0.3}s infinite` }} />
+              className={cls('wi-snowflake')} style={{ animationDelay: `${i * 0.3}s` }} />
           ))}
         </g>
       )}
 
       {kind === 'thunder' && (
         <polygon points="30,48 38,48 32,56 38,56 28,66 31,57 26,57"
-          fill="#ffd33d" style={{ animation: `${id}-flash 3s ease-in-out infinite` }} />
+          fill="#ffd33d" className={cls('wi-bolt')} />
       )}
 
       {kind === 'fog' && (

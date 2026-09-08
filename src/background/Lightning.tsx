@@ -1,6 +1,10 @@
 /**
  * Periodic lightning for the thunder scene: two full-screen flash overlays on
  * different cadences (so strikes feel irregular) plus a quick bolt. Pure CSS.
+ *
+ * The overlays are full-screen and run perpetually, so they are classed rather
+ * than styled inline — a class is what a media query can switch off, and the
+ * kiosk asks for reduced motion to stand the whole dashboard still.
  */
 export function Lightning() {
   return (
@@ -26,19 +30,23 @@ export function Lightning() {
           1.5% { opacity: 1; }
           5% { opacity: 0; }
         }
+        .halo-flash-a { animation: halo-flash-a 7s ease-out infinite; }
+        .halo-flash-b { animation: halo-flash-b 11s ease-out infinite; }
+        .halo-bolt { animation: halo-bolt 7s ease-out infinite; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .halo-flash-a, .halo-flash-b, .halo-bolt { animation: none; opacity: 0; }
+        }
       `}</style>
-      <div style={{
+      <div className="halo-flash-a" style={{
         position: 'absolute', inset: 0, background: 'rgba(220,228,255,0.9)',
-        animation: 'halo-flash-a 7s ease-out infinite',
       }} />
-      <div style={{
+      <div className="halo-flash-b" style={{
         position: 'absolute', inset: 0, background: 'rgba(200,215,255,0.8)',
-        animation: 'halo-flash-b 11s ease-out infinite',
       }} />
-      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="halo-bolt"
         style={{
           position: 'absolute', top: '6%', left: '52%', width: '14vh', height: '40vh',
-          animation: 'halo-bolt 7s ease-out infinite',
           filter: 'drop-shadow(0 0 12px rgba(220,230,255,0.9))',
         }}>
         <polygon points="55,2 30,52 48,52 38,98 78,40 56,40 70,2" fill="#eef3ff" />

@@ -32,7 +32,7 @@ export function WeatherTile() {
   return (
     <TileFrame justify="space-between" style={{ minWidth: 320 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <WeatherIcon code={weather.code} isDay={weather.isDay} size={60} />
+        <WeatherIcon code={weather.code} isDay={weather.isDay} size={60} animated />
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
             <span style={{ fontSize: '3.6rem', fontWeight: 800, lineHeight: 1 }}>{conv(weather.temp)}°</span>

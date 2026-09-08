@@ -12,10 +12,16 @@ const base: Weather = {
 describe('WeatherEffectsOverlay', () => {
   beforeEach(() => { useSettings.getState().reset() })
 
-  it('always renders a particle canvas', () => {
+  // A canvas that never draws is still a full-screen compositing layer; on a
+  // passively-cooled kiosk the idle star/rain canvas measured ~31% of a core.
+  it('renders a particle canvas only for scenes that draw particles', () => {
     useAppState.setState({ weather: base, now: new Date('2026-06-06T12:00:00') })
-    const { container } = render(<WeatherEffectsOverlay />)
-    expect(container.querySelector('canvas')).toBeInTheDocument()
+    const clear = render(<WeatherEffectsOverlay />)
+    expect(clear.container.querySelector('canvas')).toBeNull()
+
+    useAppState.setState({ weather: { ...base, code: 63 }, now: new Date('2026-06-06T12:00:00') })
+    const rain = render(<WeatherEffectsOverlay />)
+    expect(rain.container.querySelector('canvas')).toBeInTheDocument()
   })
 
   it('renders a lightning bolt only for the thunder scene', () => {

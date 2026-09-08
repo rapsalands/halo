@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useAppState } from '../store/appState'
 import { useSettings } from '../store/settings'
 import { useNowTick } from '../hooks/useNow'
@@ -9,6 +9,12 @@ import { SkyAnimation } from './SkyAnimation'
 
 /** Very slow background rotation — much gentler than the photo frame. */
 const BG_ROTATE_MS = 75_000
+
+/** How long the Ken-Burns zoom drifts after each image change before holding
+ *  still. Running it for the whole rotation never gives the compositor an idle
+ *  frame, which measured ~84% of a CPU core on its own on a passively-cooled
+ *  kiosk box; a short drift reads the same from across a room. */
+const BG_ZOOM_MS = 6_000
 
 /**
  * Full-screen weather/time backdrop: a slow cross-fading Ken-Burns slideshow of
@@ -22,6 +28,7 @@ export function BackgroundEngine() {
   // Scene changes a few times a day at most — minute granularity, not per second.
   const now = useNowTick(false)
   const performance = useSettings((s) => s.settings.performance)
+  const reduceMotion = useReducedMotion()
   const { sky, scene } = resolveScene(weather, now)
   const images = useMemo(() => sceneImages(scene), [scene])
 
@@ -37,7 +44,7 @@ export function BackgroundEngine() {
   }, [images.length, scene])
 
   const src = images[i % images.length]
-  const zoom = performance === 'high'
+  const zoom = performance === 'high' && !reduceMotion
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
@@ -59,9 +66,9 @@ export function BackgroundEngine() {
           exit={{ opacity: 0 }}
           transition={{
             opacity: { duration: 2.6, ease: 'easeInOut' },
-            // Skip the perpetual full-screen Ken-Burns zoom on Low (it forces a
-            // continuous large-layer recomposite); keep just the opacity crossfade.
-            ...(zoom ? { scale: { duration: BG_ROTATE_MS / 1000, ease: 'linear' } } : {}),
+            // Skip the full-screen Ken-Burns zoom on Low or under reduced motion
+            // (it forces a continuous large-layer recomposite); keep the crossfade.
+            ...(zoom ? { scale: { duration: BG_ZOOM_MS / 1000, ease: 'linear' } } : {}),
           }}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
